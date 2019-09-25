@@ -6064,6 +6064,15 @@ public final class Settings {
          */
         public static final String NETWORK_TRAFFIC_AUTOHIDE_THRESHOLD = "network_traffic_autohide_threshold";
 
+        /** 
+         * Back gesture activation height 
+         * n/o sixths reduced in height (0 = nothing, default)
+         * value should not exceed 5
+         * @hide 
+         */
+        @Readable
+        public static final String BACK_GESTURE_HEIGHT = "back_gesture_height";
+
         /**
          * Keys we no longer back up under the current schema, but want to continue to
          * process when restoring historical backup datasets.
