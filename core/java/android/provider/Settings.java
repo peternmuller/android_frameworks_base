@@ -6386,6 +6386,11 @@ public final class Settings {
         public static final String NOTIFICATION_VIBRATION_PATTERN = "notification_vibration_pattern";
 
         /**
+         * @hide
+         */
+        public static final String SCREENSHOT_SHUTTER_SOUND = "screenshot_shutter_sound";
+
+        /**
          * Keys we no longer back up under the current schema, but want to continue to
          * process when restoring historical backup datasets.
          *
