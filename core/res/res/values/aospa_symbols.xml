@@ -89,4 +89,7 @@
     <java-symbol type="string" name="kilobytespersecond_compact" />
     <java-symbol type="string" name="megabytespersecond_compact" />
 
+    <!-- For dynamic default font styles -->
+    <java-symbol type="string" name="config_bodyFontFamily" />
+
 </resources>
