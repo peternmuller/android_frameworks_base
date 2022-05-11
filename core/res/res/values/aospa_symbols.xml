@@ -20,6 +20,9 @@
     <java-symbol type="string" name="config_lightFontFamily" />
     <java-symbol type="string" name="config_regularFontFamily" />
 
+    <!-- These are system packages exempted from privacy indicator -->
+    <java-symbol type="array" name="config_indicatorExemptedPackageNames" />
+
     <!-- Package Manager -->
     <java-symbol type="array" name="config_deviceDisabledComponents" />
     <java-symbol type="array" name="config_globallyDisabledComponents" />
