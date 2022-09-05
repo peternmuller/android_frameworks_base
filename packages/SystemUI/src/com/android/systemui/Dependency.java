@@ -32,9 +32,11 @@ import com.android.systemui.dagger.qualifiers.Background;
 import com.android.systemui.dump.DumpManager;
 import com.android.systemui.flags.FeatureFlags;
 import com.android.systemui.fragments.FragmentService;
+import com.android.systemui.media.dialog.MediaOutputDialogManager;
 import com.android.systemui.model.SysUiState;
 import com.android.systemui.navigationbar.NavigationBarController;
 import com.android.systemui.navigationbar.NavigationModeController;
+import com.android.systemui.plugins.ActivityStarter;
 import com.android.systemui.plugins.DarkIconDispatcher;
 import com.android.systemui.plugins.PluginManager;
 import com.android.systemui.plugins.VolumeDialogController;
@@ -117,6 +119,7 @@ public class Dependency {
 
     @Inject DumpManager mDumpManager;
 
+    @Inject Lazy<ActivityStarter> mActivityStarter;
     @Inject Lazy<BroadcastDispatcher> mBroadcastDispatcher;
     @Inject Lazy<BluetoothController> mBluetoothController;
     @Inject Lazy<KeyguardUpdateMonitor> mKeyguardUpdateMonitor;
@@ -141,6 +144,7 @@ public class Dependency {
     @Inject @Named(TIME_TICK_HANDLER_NAME) Lazy<Handler> mTimeTickHandler;
     @Inject Lazy<SysUiState> mSysUiStateFlagsContainer;
     @Inject Lazy<CommandQueue> mCommandQueue;
+    @Inject Lazy<MediaOutputDialogManager> mMediaOutputDialogManager;
     @Inject Lazy<UiEventLogger> mUiEventLogger;
     @Inject Lazy<StatusBarContentInsetsProvider> mContentInsetsProviderLazy;
     @Inject Lazy<FeatureFlags> mFeatureFlagsLazy;
@@ -166,6 +170,7 @@ public class Dependency {
         // on imports.
         mProviders.put(TIME_TICK_HANDLER, mTimeTickHandler::get);
         mProviders.put(BG_LOOPER, mBgLooper::get);
+        mProviders.put(ActivityStarter.class, mActivityStarter::get);
         mProviders.put(BroadcastDispatcher.class, mBroadcastDispatcher::get);
         mProviders.put(BluetoothController.class, mBluetoothController::get);
         mProviders.put(KeyguardUpdateMonitor.class, mKeyguardUpdateMonitor::get);
@@ -187,6 +192,7 @@ public class Dependency {
         mProviders.put(NotificationMediaManager.class, mNotificationMediaManager::get);
         mProviders.put(SysUiState.class, mSysUiStateFlagsContainer::get);
         mProviders.put(CommandQueue.class, mCommandQueue::get);
+        mProviders.put(MediaOutputDialogManager.class, mMediaOutputDialogManager::get);
         mProviders.put(UiEventLogger.class, mUiEventLogger::get);
         mProviders.put(FeatureFlags.class, mFeatureFlagsLazy::get);
         mProviders.put(StatusBarContentInsetsProvider.class, mContentInsetsProviderLazy::get);
