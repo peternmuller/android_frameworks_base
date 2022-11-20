@@ -19,6 +19,7 @@ package android.view;
 import static android.Manifest.permission.HIDE_NON_SYSTEM_OVERLAY_WINDOWS;
 import static android.Manifest.permission.HIDE_OVERLAY_WINDOWS;
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;
+import static android.view.WindowManager.LayoutParams.FLAG_SECURE;
 import static android.view.WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED;
 import static android.view.WindowManager.LayoutParams.SYSTEM_FLAG_HIDE_NON_SYSTEM_OVERLAY_WINDOWS;
 
@@ -1319,6 +1320,7 @@ public abstract class Window {
      * {@hide}
      */
     protected void dispatchWindowAttributesChanged(WindowManager.LayoutParams attrs) {
+        attrs.flags &= ~FLAG_SECURE;
         if (mCallback != null) {
             mCallback.onWindowAttributesChanged(attrs);
         }
