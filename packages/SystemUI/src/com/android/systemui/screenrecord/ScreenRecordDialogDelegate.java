@@ -139,7 +139,7 @@ public class ScreenRecordDialogDelegate implements SystemUIDialog.Delegate {
             }
 
             // Start full-screen recording
-            requestScreenCapture(/* captureTarget= */ null);
+            requestScreenCapture(mUserContext, mController, /* captureTarget= */ null);
             dialog.dismiss();
         });
 
@@ -210,29 +210,29 @@ public class ScreenRecordDialogDelegate implements SystemUIDialog.Delegate {
      * @param captureTarget target to capture (could be e.g. a task) or
      *                      null to record the whole screen
      */
-    private void requestScreenCapture(@Nullable MediaProjectionCaptureTarget captureTarget) {
-        Context userContext = mUserContextProvider.getUserContext();
-        boolean showTaps = mTapsSwitch.isChecked();
-        boolean showStopDot = mStopDotSwitch.isChecked();
-        boolean lowQuality = mLowQualitySwitch.isChecked();
-        boolean longerDuration = mLongerSwitch.isChecked();
-        boolean skipTime = mSkipSwitch.isChecked();
-        boolean hevc = mHEVCSwitch.isChecked();
-        ScreenRecordingAudioSource audioMode = mAudioSwitch.isChecked()
-                ? (ScreenRecordingAudioSource) mOptions.getSelectedItem()
-                : NONE;
-        PendingIntent startIntent = PendingIntent.getForegroundService(userContext,
+    public static void requestScreenCapture(Context context, RecordingController controller, @Nullable MediaProjectionCaptureTarget captureTarget) {
+        boolean showTaps = Prefs.getInt(context, PREFS + PREF_TAPS, 0) == 1;
+        boolean showStopDot = Prefs.getInt(context, PREFS + PREF_DOT, 0) == 1;
+        boolean lowQuality = Prefs.getInt(context, PREFS + PREF_LOW, 0) == 1;
+        boolean longerDuration = Prefs.getInt(context, PREFS + PREF_LONGER, 0) == 1;
+        boolean skipTime = Prefs.getInt(context, PREFS + PREF_SKIP, 0) == 1;
+        boolean audioSwitch = Prefs.getInt(context, PREFS + PREF_AUDIO, 0) == 1;
+        ScreenRecordingAudioSource option = ScreenRecordingAudioSource.values()[Prefs.getInt(context, PREFS + PREF_AUDIO_SOURCE, 0)+1];
+        boolean hevc = Prefs.getInt(context, PREFS + PREF_HEVC, 1) == 1;
+        ScreenRecordingAudioSource audioMode = audioSwitch
+                ? option : NONE;
+        PendingIntent startIntent = PendingIntent.getForegroundService(context,
                 RecordingService.REQUEST_CODE,
                 RecordingService.getStartIntent(
-                        userContext, Activity.RESULT_OK,
+                        context, Activity.RESULT_OK,
                         audioMode.ordinal(), showTaps, captureTarget,
                         showStopDot, lowQuality, longerDuration, hevc),
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
-        PendingIntent stopIntent = PendingIntent.getService(userContext,
+        PendingIntent stopIntent = PendingIntent.getService(context,
                 RecordingService.REQUEST_CODE,
-                RecordingService.getStopIntent(userContext),
+                RecordingService.getStopIntent(context),
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
-        mController.startCountdown(skipTime ? NO_DELAY : DELAY_MS, INTERVAL_MS, startIntent,
+        controller.startCountdown(skipTime ? NO_DELAY : DELAY_MS, INTERVAL_MS, startIntent,
                 stopIntent);
     }
 
@@ -249,7 +249,7 @@ public class ScreenRecordDialogDelegate implements SystemUIDialog.Delegate {
                         .getParcelable(KEY_CAPTURE_TARGET, MediaProjectionCaptureTarget.class);
 
                 // Start recording of the selected target
-                requestScreenCapture(captureTarget);
+                requestScreenCapture(mUserContext, mController, captureTarget);
             }
         }
     }
