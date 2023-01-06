@@ -87,6 +87,7 @@ import android.content.pm.InstantAppResolveInfo;
 import android.content.pm.InstrumentationInfo;
 import android.content.pm.KeySet;
 import android.content.pm.PackageInfo;
+import android.content.pm.PackageInstaller;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManagerInternal;
 import android.content.pm.ParceledListSlice;
@@ -422,6 +423,10 @@ public class ComputerEngine implements Computer {
     private final CompilerStats mCompilerStats;
     private final PackageManagerInternal.ExternalSourcesPolicy mExternalSourcesPolicy;
     private final CrossProfileIntentResolverEngine mCrossProfileIntentResolverEngine;
+
+    private static final String AURORA_SERVICES = "com.aurora.services";
+    private static final String AURORA_STORE = "com.aurora.store";
+    private static final String PLAY_STORE = "com.android.vending";
 
     // PackageManagerService attributes that are primitives are referenced through the
     // pms object directly.  Primitives are the only attributes so referenced.
@@ -5101,6 +5106,22 @@ public class ComputerEngine implements Computer {
         if (ps == null || shouldFilterApplicationIncludingUninstalledNotArchived(ps, callingUid,
                 userId)) {
             return null;
+        }
+
+        InstallSource installSource = ps.getInstallSource();
+        final String installerPackageName = installSource.mInstallerPackageName;
+        if (installSource != null && installerPackageName != null
+                && mSettings.getPackage(PLAY_STORE) != null
+                && callingUid != Process.SYSTEM_UID
+                && (AURORA_STORE.equals(installerPackageName)
+                || AURORA_SERVICES.equals(installerPackageName))) {
+            return InstallSource.create(PLAY_STORE, PLAY_STORE, PLAY_STORE,
+                            installSource.mInstallerPackageUid, // FIXME: likely wrong
+            		    installSource.mUpdateOwnerPackageName,
+            		    installSource.mInstallerAttributionTag,
+                            PackageInstaller.PACKAGE_SOURCE_STORE)
+                    .setInitiatingPackageSignatures(new PackageSignatures(
+                            mSettings.getPackage(PLAY_STORE).getSigningDetails()));
         }
 
         return ps.getInstallSource();
