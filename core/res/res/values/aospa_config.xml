@@ -117,4 +117,7 @@
     <!-- Device model (Build.MODEL) to spoof for netflix, if not empty -->
     <string name="config_netflixSpoofModel" translatable="false"></string>
 
+    <!-- Whether device supports QTI Boost Framework -->
+    <bool name="config_supportsBoostFramework">true</bool>
+
 </resources>
