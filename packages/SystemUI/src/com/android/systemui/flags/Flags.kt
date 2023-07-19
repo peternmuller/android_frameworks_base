@@ -105,7 +105,7 @@ object Flags {
 
     /** Flag to control the revamp of keyguard biometrics progress animation */
     // TODO(b/244313043): Tracking bug
-    @JvmField val BIOMETRICS_ANIMATION_REVAMP = unreleasedFlag("biometrics_animation_revamp")
+    @JvmField val BIOMETRICS_ANIMATION_REVAMP = releasedFlag("biometrics_animation_revamp")
 
     // flag for controlling auto pin confirmation and material u shapes in bouncer
     @JvmField
