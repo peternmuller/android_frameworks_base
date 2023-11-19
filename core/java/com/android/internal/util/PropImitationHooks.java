@@ -68,6 +68,7 @@ public class PropImitationHooks {
     public static final String PROCESS_GMS_UNSTABLE = PACKAGE_GMS + ".unstable";
     private static final String PACKAGE_NETFLIX = "com.netflix.mediaclient";
     private static final String PACKAGE_GPHOTOS = "com.google.android.apps.photos";
+    private static final String FEATURE_NEXUS_PRELOAD = "com.google.android.apps.photos.NEXUS_PRELOAD";
 
     private static final String PROP_SECURITY_PATCH = "persist.sys.pihooks.security_patch";
     private static final String PROP_FIRST_API_LEVEL = "persist.sys.pihooks.first_api_level";
@@ -76,6 +77,16 @@ public class PropImitationHooks {
     private static final String PACKAGE_TURBO = "com.google.android.apps.turbo";
     private static final String PACKAGE_VELVET = "com.google.android.googlequicksearchbox";
     private static final String PACKAGE_SETUPWIZARD = "com.google.android.setupwizard";
+
+    private static final Map<String, String> sPixelXLProps = new HashMap<>();
+    static {
+        sPixelXLProps.put("BRAND", "google");
+        sPixelXLProps.put("MANUFACTURER", "Google");
+        sPixelXLProps.put("DEVICE", "marlin");
+        sPixelXLProps.put("PRODUCT", "marlin");
+        sPixelXLProps.put("MODEL", "Pixel XL");
+        sPixelXLProps.put("FINGERPRINT", "google/marlin/marlin:10/QP1A.191005.007.A3/5972272:user/release-keys");
+    }
 
     private static final ComponentName GMS_ADD_ACCOUNT_ACTIVITY = ComponentName.unflattenFromString(
             "com.google.android.gms/.auth.uiflows.minutemaid.MinuteMaidActivity");
@@ -150,6 +161,9 @@ public class PropImitationHooks {
                    || packageName.equals(PACKAGE_SETUPWIZARD) || packageName.equals(PACKAGE_GMS)) {
             dlog("Spoofing Pixel 9 Pro for: " + packageName);
             sPixelNineProps.forEach((k, v) -> setPropValue(k, v));
+        } else if (packageName.equals(PACKAGE_GPHOTOS)) {
+            dlog("Spoofing Pixel XL for: " + packageName);
+            sPixelXLProps.forEach((k, v) -> setPropValue(k, v));
         }
     }
 
@@ -319,10 +333,14 @@ public class PropImitationHooks {
     }
 
     public static boolean hasSystemFeature(String name, boolean has) {
-        if (sIsPhotos && !sIsPixelDevice && has
-                && sPixelFeatures.stream().anyMatch(name::contains)) {
-            dlog("Blocked system feature " + name + " for Google Photos");
-            has = false;
+        if (sIsPhotos) {
+            if (has && sPixelFeatures.stream().anyMatch(name::contains)) {
+                dlog("Blocked system feature " + name + " for Google Photos");
+                has = false;
+            } else if (!has && name.equalsIgnoreCase(FEATURE_NEXUS_PRELOAD)) {
+                dlog("Enabled system feature " + name + " for Google Photos");
+                has = true;
+            }
         }
         return has;
     }
