@@ -33,7 +33,7 @@
     <bool name="config_hspa_data_distinguishable">false</bool>
 
     <!-- Control whether to show Wifi standard in Wifi icon -->
-    <bool name="config_show_wifi_standard">true</bool>
+    <bool name="config_show_wifi_standard">false</bool>
 
     <!-- Roaming symbol (R) path for SignalDrawable as defined on a 24x24 canvas. -->
     <string name="config_signalRoamingPath" translatable="false">
