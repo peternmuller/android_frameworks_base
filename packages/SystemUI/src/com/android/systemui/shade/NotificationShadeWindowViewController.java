@@ -23,6 +23,11 @@ import static com.android.systemui.statusbar.StatusBarState.KEYGUARD;
 import static com.android.systemui.util.kotlin.JavaAdapterKt.collectFlow;
 
 import android.app.StatusBarManager;
+import android.database.ContentObserver;
+import android.os.Handler;
+import android.os.PowerManager;
+import android.os.UserHandle;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.KeyEvent;
@@ -41,6 +46,7 @@ import com.android.systemui.bouncer.domain.interactor.PrimaryBouncerInteractor;
 import com.android.systemui.bouncer.ui.binder.BouncerViewBinder;
 import com.android.systemui.classifier.FalsingCollector;
 import com.android.systemui.dagger.SysUISingleton;
+import com.android.systemui.dagger.qualifiers.Main;
 import com.android.systemui.deviceentry.shared.DeviceEntryUdfpsRefactor;
 import com.android.systemui.dock.DockManager;
 import com.android.systemui.dump.DumpManager;
@@ -62,6 +68,7 @@ import com.android.systemui.statusbar.LockscreenShadeTransitionController;
 import com.android.systemui.statusbar.NotificationInsetsController;
 import com.android.systemui.statusbar.NotificationShadeDepthController;
 import com.android.systemui.statusbar.NotificationShadeWindowController;
+import com.android.systemui.statusbar.StatusBarState;
 import com.android.systemui.statusbar.SysuiStatusBarStateController;
 import com.android.systemui.statusbar.notification.domain.interactor.NotificationLaunchAnimationInteractor;
 import com.android.systemui.statusbar.notification.stack.AmbientState;
@@ -154,10 +161,16 @@ public class NotificationShadeWindowViewController implements Dumpable {
                     step.getTransitionState() == TransitionState.RUNNING;
             };
     private final SystemClock mClock;
+    private final PowerManager mPowerManager;
+
+    private GestureDetector mDoubleTapGestureListener;
+    private SettingsObserver mSettingsObserver;
+    private boolean mDoubleTapEnabled;
 
     @ExperimentalCoroutinesApi
     @Inject
     public NotificationShadeWindowViewController(
+            @Main Handler handler,
             LockscreenShadeTransitionController transitionController,
             FalsingCollector falsingCollector,
             SysuiStatusBarStateController statusBarStateController,
@@ -251,6 +264,26 @@ public class NotificationShadeWindowViewController implements Dumpable {
                     progressProvider -> progressProvider.addCallback(
                             mDisableSubpixelTextTransitionListener));
         }
+
+        mPowerManager = mView.getContext().getSystemService(PowerManager.class);
+        mDoubleTapGestureListener = new GestureDetector(mView.getContext(),
+                new GestureDetector.SimpleOnGestureListener() {
+            @Override
+            public boolean onDoubleTap(MotionEvent event) {
+                if (mDoubleTapEnabled
+                        && mStatusBarStateController.getState() == StatusBarState.KEYGUARD
+                        && !mService.isBouncerShowing()
+                        //&& !mNotificationPanelViewController.isShadeFullyExpanded()
+                        && !mStatusBarStateController.isDozing()
+                        && !mStatusBarStateController.isPulsing()) {
+                    mPowerManager.goToSleep(event.getEventTime());
+                    return true;
+                }
+                return false;
+            }
+        });
+        mSettingsObserver = new SettingsObserver(handler);
+        mSettingsObserver.register();
 
         lockIconViewController.setLockIconView(mView.findViewById(R.id.lock_icon_view));
         dumpManager.registerDumpable(this);
@@ -369,6 +402,7 @@ public class NotificationShadeWindowViewController implements Dumpable {
                 }
 
                 mFalsingCollector.onTouchEvent(ev);
+                mDoubleTapGestureListener.onTouchEvent(ev);
                 mPulsingWakeupGestureHandler.onTouchEvent(ev);
 
                 if (!SceneContainerFlag.isEnabled()
@@ -734,5 +768,29 @@ public class NotificationShadeWindowViewController implements Dumpable {
     @VisibleForTesting
     void setDragDownHelper(DragDownHelper dragDownHelper) {
         mDragDownHelper = dragDownHelper;
+    }
+
+    private final class SettingsObserver extends ContentObserver {
+        SettingsObserver(Handler handler) {
+            super(handler);
+        }
+
+        @Override
+        public void onChange(boolean selfChange) {
+            update();
+        }
+
+        public void register() {
+            mView.getContext().getContentResolver().registerContentObserver(
+                    Settings.System.getUriFor(Settings.System.GESTURE_DOUBLE_TAP_SLEEP),
+                    false, this);
+            update();
+        }
+
+        public void update() {
+            mDoubleTapEnabled = Settings.System.getIntForUser(
+                    mView.getContext().getContentResolver(),
+                    Settings.System.GESTURE_DOUBLE_TAP_SLEEP, 1, UserHandle.USER_CURRENT) == 1;
+        }
     }
 }
