@@ -360,9 +360,9 @@ public class VolumeDialogImpl implements VolumeDialog, Dumpable,
     private String mActiveAppRowPackage;
 
     @VisibleForTesting
-    final int mVolumeRingerIconDrawableId = R.drawable.ic_speaker_on;
+    final int mVolumeRingerIconDrawableId = R.drawable.ic_volume_ringer;
     @VisibleForTesting
-    final int mVolumeRingerMuteIconDrawableId = R.drawable.ic_speaker_mute;
+    final int mVolumeRingerMuteIconDrawableId = R.drawable.ic_volume_ringer_mute;
 
     private int mOriginalGravity;
     private final DevicePostureController.Callback mDevicePostureControllerCallback;
