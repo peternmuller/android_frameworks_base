@@ -14,7 +14,7 @@
  * limitations under the License
  */
 
-package com.android.server.lineage.common;
+package com.android.internal.database;
 
 import android.app.ActivityManagerNative;
 import android.app.IUserSwitchObserver;
