@@ -167,4 +167,8 @@
       -->
     </string-array>
 
+    <!-- Slider vibrations fallbacks - set either to non positive to disable
+         maximum duration in ms the slider vibrations scale to from 0 -->
+    <integer name="config_sliderVibFallbackDuration">100</integer>
+
 </resources>
