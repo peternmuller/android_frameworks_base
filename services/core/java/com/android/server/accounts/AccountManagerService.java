@@ -72,6 +72,7 @@ import android.content.pm.SigningDetails.CertCapabilities;
 import android.content.pm.UserInfo;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteCantOpenDatabaseException;
+import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteFullException;
 import android.database.sqlite.SQLiteStatement;
 import android.os.Binder;
@@ -1461,8 +1462,8 @@ public class AccountManagerService
                 List<Integer> uids;
                 try {
                     uids = accounts.accountsDb.findAllUidGrants();
-                } catch (SQLiteCantOpenDatabaseException e) {
-                    Log.w(TAG, "Could not delete grants for user = " + accounts.userId);
+                } catch (SQLiteException e) {
+                    Log.w(TAG, "Could not delete grants for user = " + accounts.userId, e);
                     return;
                 }
                 for (int uid : uids) {
@@ -4471,6 +4472,9 @@ public class AccountManagerService
                     opPackageName,
                     visibleAccountTypes,
                     false /* includeUserManagedNotVisible */);
+        } catch (SQLiteException e) {
+            Log.w(TAG, "Could not get accounts for user " + userId, e);
+            return new Account[]{};
         } finally {
             restoreCallingIdentity(identityToken);
         }
@@ -4546,7 +4550,7 @@ public class AccountManagerService
         try {
             return getAccountsAsUserForPackage(type, userId, opPackageName /* callingPackage */, -1,
                     opPackageName, false /* includeUserManagedNotVisible */);
-        } catch (SQLiteCantOpenDatabaseException e) {
+        } catch (SQLiteException e) {
             Log.e(TAG, "Could not get accounts for user " + userId, e);
             return new Account[]{};
         }
@@ -4556,7 +4560,7 @@ public class AccountManagerService
     private Account[] getAccountsOrEmptyArray(String type, int userId, String opPackageName) {
         try {
             return getAccountsAsUser(type, userId, opPackageName);
-        } catch (SQLiteCantOpenDatabaseException e) {
+        } catch (SQLiteException e) {
             Log.w(TAG, "Could not get accounts for user " + userId, e);
             return new Account[]{};
         }
