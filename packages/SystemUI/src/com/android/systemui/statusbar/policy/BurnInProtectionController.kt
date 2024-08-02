@@ -108,14 +108,12 @@ class BurnInProtectionController @Inject constructor(
             maxNavBarOffsetX = if (isGesturalMode()) {
                 0
             } else {
-                getDimensionPixelSize(R.dimen.floating_rotation_button_min_margin) / 4
+                getDimensionPixelSize(R.dimen.navigation_bar_burn_in_offset_max_x)
             }
             maxNavBarOffsetY = if (isGesturalMode()) {
                 getDimensionPixelSize(R.dimen.navigation_handle_bottom) / 3
             } else {
-                val frameHeight = getDimensionPixelSize(R.dimen.navigation_bar_height)
-                val buttonHeight = getDimensionPixelSize(R.dimen.navigation_icon_size)
-                (frameHeight - buttonHeight) / 3
+                getDimensionPixelSize(R.dimen.navigation_bar_burn_in_offset_max_y)
             }
         }
         logD {
