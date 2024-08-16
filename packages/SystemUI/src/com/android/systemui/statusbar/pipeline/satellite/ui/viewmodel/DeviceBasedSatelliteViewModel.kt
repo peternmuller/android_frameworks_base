@@ -22,9 +22,12 @@ import com.android.systemui.dagger.SysUISingleton
 import com.android.systemui.dagger.qualifiers.Application
 import com.android.systemui.log.LogBuffer
 import com.android.systemui.log.core.LogLevel
+import com.android.systemui.log.table.TableLogBuffer
+import com.android.systemui.log.table.logDiffsForTable
 import com.android.systemui.res.R
 import com.android.systemui.statusbar.pipeline.airplane.data.repository.AirplaneModeRepository
 import com.android.systemui.statusbar.pipeline.dagger.DeviceBasedSatelliteInputLog
+import com.android.systemui.statusbar.pipeline.dagger.DeviceBasedSatelliteTableLog
 import com.android.systemui.statusbar.pipeline.satellite.domain.interactor.DeviceBasedSatelliteInteractor
 import com.android.systemui.statusbar.pipeline.satellite.shared.model.SatelliteConnectionState
 import com.android.systemui.statusbar.pipeline.satellite.ui.model.SatelliteIconModel
@@ -71,6 +74,7 @@ constructor(
     @Application scope: CoroutineScope,
     airplaneModeRepository: AirplaneModeRepository,
     @DeviceBasedSatelliteInputLog logBuffer: LogBuffer,
+    @DeviceBasedSatelliteTableLog tableLog: TableLogBuffer,
 ) : DeviceBasedSatelliteViewModel {
 
     // This adds a 10 seconds delay before showing the icon
@@ -151,6 +155,13 @@ constructor(
                     flowOf(false)
                 }
             }
+            .distinctUntilChanged()
+            .logDiffsForTable(
+                tableLog,
+                columnPrefix = "vm",
+                columnName = COL_VISIBLE,
+                initialValue = false,
+            )
             .stateIn(scope, SharingStarted.WhileSubscribed(), false)
 
     override val icon: StateFlow<Icon?> =
@@ -206,5 +217,8 @@ constructor(
     companion object {
         private const val TAG = "DeviceBasedSatelliteViewModel"
         private val DELAY_DURATION = 10.seconds
+
+        const val COL_VISIBLE_CONDITION = "visCondition"
+        const val COL_VISIBLE = "visible"
     }
 }
