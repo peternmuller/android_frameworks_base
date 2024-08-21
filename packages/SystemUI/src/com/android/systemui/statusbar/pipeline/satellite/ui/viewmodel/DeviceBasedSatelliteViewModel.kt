@@ -36,14 +36,12 @@ import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 
 /**
@@ -107,14 +105,14 @@ constructor(
             }
             .stateIn(scope, SharingStarted.WhileSubscribed(), false)
 
-    private val canShowIcon =
+   private val canShowIcon =
         combine(interactor.isSatelliteAllowed, interactor.isSatelliteProvisioned) {
             allowed,
             provisioned ->
             allowed && provisioned
         }
 
-    private val showIcon =
+   private val showIcon =
         canShowIcon
             .flatMapLatest { canShow ->
                 if (!canShow) {
@@ -134,25 +132,6 @@ constructor(
                                 connectionState == SatelliteConnectionState.Connected
                         }
                     }
-                }
-            }
-
-    // This adds a 10 seconds delay before showing the icon
-    private val shouldActuallyShowIcon: StateFlow<Boolean> =
-        shouldShowIcon
-            .distinctUntilChanged()
-            .flatMapLatest { shouldShow ->
-                if (shouldShow) {
-                    logBuffer.log(
-                        TAG,
-                        LogLevel.INFO,
-                        { long1 = DELAY_DURATION.inWholeSeconds },
-                        { "Waiting $long1 seconds before showing the satellite icon" }
-                    )
-                    delay(DELAY_DURATION)
-                    flowOf(true)
-                } else {
-                    flowOf(false)
                 }
             }
             .distinctUntilChanged()
@@ -204,21 +183,21 @@ constructor(
                     null
                 }
             }
-            .onEach {
-                logBuffer.log(
-                    TAG,
-                    LogLevel.INFO,
-                    { str1 = it },
-                    { "Resulting carrier text = $str1" }
-                )
-            }
+            .distinctUntilChanged()
+            .logDiffsForTable(
+                tableLog,
+                columnPrefix = "vm",
+                columnName = COL_CARRIER_TEXT,
+                initialValue = null,
+            )
             .stateIn(scope, SharingStarted.WhileSubscribed(), null)
 
     companion object {
         private const val TAG = "DeviceBasedSatelliteViewModel"
         private val DELAY_DURATION = 10.seconds
 
-        const val COL_VISIBLE_CONDITION = "visCondition"
+        const val COL_VISIBLE_FOR_OOS = "visibleForOos"
         const val COL_VISIBLE = "visible"
+        const val COL_CARRIER_TEXT = "carrierText"
     }
 }
