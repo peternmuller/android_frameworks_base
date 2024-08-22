@@ -1951,6 +1951,10 @@ class WindowOrganizerController extends IWindowOrganizerController.Stub
                         + " task=" + task);
                 return false;
             }
+            if (newParentInMultiWindow && hop.getReparentTopOnly()
+                    && task.getNonFinishingActivityCount() == 0) {
+                return false;
+            }
             if (!ArrayUtils.isEmpty(hop.getActivityTypes())
                     && !ArrayUtils.contains(hop.getActivityTypes(), task.getActivityType())) {
                 return false;
