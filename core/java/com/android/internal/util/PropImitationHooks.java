@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Paranoid Android
+ * Copyright (C) 2022-2024 Paranoid Android
  *           (C) 2023 ArrowOS
  *           (C) 2023 The LibreMobileOS Foundation
  *
@@ -54,7 +54,7 @@ public class PropImitationHooks {
     private static final Boolean sDisableGmsProps = SystemProperties.getBoolean(
             "persist.sys.pihooks.disable.gms_props", false);
 
-    private static final Boolean sDisableKeyAttestationBlock = SystemProperties.getBoolean(
+    public static final Boolean sDisableKeyAttestationBlock = SystemProperties.getBoolean(
             "persist.sys.pihooks.disable.gms_key_attestation_block", false);
 
     private static final String PACKAGE_ARCORE = "com.google.ar.core";
@@ -148,10 +148,12 @@ public class PropImitationHooks {
         setPropValue(key, value, false);
     }
 
+    public static IPihManager getPihManager() {
+        return IPihManager.Stub.asInterface(ServiceManager.getService(PIH_SERVICE_NAME));
+    }
+
     private static void loadCertifiedProps() {
-        IPihManager pihManager = IPihManager.Stub.asInterface(
-                ServiceManager.getService(PIH_SERVICE_NAME));
-        
+        IPihManager pihManager = getPihManager();
         if (pihManager == null) {
             dlog("Failed to get pih manager service.");
             return;
@@ -274,6 +276,12 @@ public class PropImitationHooks {
     public static void onEngineGetCertificateChain() {
         if (sDisableKeyAttestationBlock) {
             dlog("Key attestation blocking is disabled by user");
+            return;
+        }
+
+        // If a keybox is found, don't block key attestation
+        if (KeyProviderManager.isKeyboxAvailable()) {
+            dlog("Key attestation blocking is disabled because a keybox is defined to spoof");
             return;
         }
 
