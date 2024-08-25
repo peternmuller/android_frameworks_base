@@ -1419,7 +1419,7 @@ final class InstallPackageHelper {
                         }
                     }
                 }
-                if (replace) {
+                if (ps != null && replace) {
                     // Prevent apps opting out from runtime permissions
                     final int oldTargetSdk = ps.getTargetSdkVersion();
                     final int newTargetSdk = parsedPackage.getTargetSdkVersion();
