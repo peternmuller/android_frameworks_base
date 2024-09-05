@@ -1211,6 +1211,12 @@ public final class SatelliteManager {
                                         () -> callback.onReceiveDatagramStateChanged(
                                                 state, receivePendingCount, errorCode)));
                             }
+
+                            @Override
+                            public void onSendDatagramRequested(int datagramType) {
+                                executor.execute(() -> Binder.withCleanCallingIdentity(
+                                        () -> callback.onSendDatagramRequested(datagramType)));
+                            }
                         };
                 sSatelliteTransmissionUpdateCallbackMap.put(callback, internalCallback);
                 telephony.startSatelliteTransmissionUpdates(errorCallback, internalCallback);
