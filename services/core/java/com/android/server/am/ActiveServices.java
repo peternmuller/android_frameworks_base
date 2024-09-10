@@ -285,7 +285,7 @@ public final class ActiveServices {
     private static final String AIDL_SERVICE =
             "vendor.qti.hardware.servicetrackeraidl.IServicetracker/default";
 
-    private static boolean mIsAIDLSupported = true;
+    private static boolean mIsAIDLSupported = false;
     // Foreground service types that always get immediate notification display,
     // expressed in the same bitmask format that ServiceRecord.foregroundServiceType
     // uses.
