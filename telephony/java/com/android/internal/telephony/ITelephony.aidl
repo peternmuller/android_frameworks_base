@@ -3417,4 +3417,31 @@ interface ITelephony {
      * @hide
      */
     boolean setSatelliteSubscriberIdListChangedIntentComponent(in String name);
+
+    /**
+     * This API can be used by only CTS to override the Euicc UI component.
+     *
+     * @param componentName ui component to be launched for testing
+     * @hide
+     */
+    void setTestEuiccUiComponent(in ComponentName componentName);
+
+    /**
+     * This API can be used by only CTS to retrieve the Euicc UI component.
+     *
+     * @return The Euicc UI component for testing.
+     * @hide
+     */
+    ComponentName getTestEuiccUiComponent();
+
+    /**
+     * This API can be used only for test purpose to override the carrier romaing Ntn eligibility
+     *
+     * @param status to update Ntn Eligibility.
+     * @param resetRequired to reset the overridden flag in satellite controller.
+     * @return {@code true} if the shell command is successful, {@code false} otherwise.
+     * @hide
+     */
+    boolean overrideCarrierRoamingNtnEligibilityChanged(
+            in boolean status, in boolean resetRequired);
 }
