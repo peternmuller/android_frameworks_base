@@ -1196,12 +1196,13 @@ public class MediaOutputController implements LocalMediaManager.DeviceCallback,
         for (BluetoothLeBroadcastReceiveState receiveState: assistant.getAllSources(sink)) {
             for (int i = 0; i < receiveState.getNumSubgroups(); i++) {
                 Long syncState = receiveState.getBisSyncState().get(i);
-                if (syncState > 0 && syncState < 0xFFFFFFFF) {
+                if (syncState > 0 && syncState < 0xFFFFFFFFL) {
                     Log.d(TAG, "Synchronized to " + String.valueOf(syncState));
                     return true;
                 }
             }
         }
+        Log.d(TAG, "isSourceAddedIntoSinkDevice: no any BIS synced");
         return false;
     }
 
