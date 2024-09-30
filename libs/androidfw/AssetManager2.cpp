@@ -1167,15 +1167,17 @@ base::expected<std::monostate, NullOrIOError> AssetManager2::ResolveReference(
 }
 
 base::expected<const std::vector<uint32_t>*, NullOrIOError> AssetManager2::GetBagResIdStack(
-    uint32_t resid) const {
-  auto [it, inserted] = cached_bag_resid_stacks_.try_emplace(resid);
-  if (inserted) {
-    // This is a new entry in the cache, need to populate it.
-    if (auto maybe_bag = GetBag(resid, it->second); UNLIKELY(IsIOError(maybe_bag))) {
-      cached_bag_resid_stacks_.erase(it);
-      return base::unexpected(maybe_bag.error());
-    }
-  }
+   uint32_t resid) const {
+   auto it = cached_bag_resid_stacks_.find(resid);
+   if (it != cached_bag_resid_stacks_.end()) {
+     return &it->second;
+   }
+   std::vector<uint32_t> stacks;
+   if (auto maybe_bag = GetBag(resid, stacks); UNLIKELY(IsIOError(maybe_bag))) {
+     return base::unexpected(maybe_bag.error());
+   }
+
+   it = cached_bag_resid_stacks_.emplace(resid, std::move(stacks)).first;
   return &it->second;
 }
 
@@ -1193,8 +1195,10 @@ base::expected<const ResolvedBag*, NullOrIOError> AssetManager2::ResolveBag(
 }
 
 base::expected<const ResolvedBag*, NullOrIOError> AssetManager2::GetBag(uint32_t resid) const {
-  auto [resid_stacks_it, _] = cached_bag_resid_stacks_.try_emplace(resid);
-  resid_stacks_it->second.clear();
+  auto resid_stacks_it = cached_bag_resid_stacks_.find(resid);
+  if (resid_stacks_it == cached_bag_resid_stacks_.end()) {
+    resid_stacks_it = cached_bag_resid_stacks_.emplace(resid, std::vector<uint32_t>{}).first;
+  }
   const auto bag = GetBag(resid, resid_stacks_it->second);
   if (UNLIKELY(IsIOError(bag))) {
     cached_bag_resid_stacks_.erase(resid_stacks_it);
