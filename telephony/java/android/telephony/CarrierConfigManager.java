@@ -9831,7 +9831,7 @@ public class CarrierConfigManager {
      * users to switch to using satellite emergency messaging.</li>
      * </ul>
      * <p>
-     * The default value is 300 seconds.
+     * The default value is 180 seconds.
      */
     @FlaggedApi(Flags.FLAG_CARRIER_ENABLED_SATELLITE_FLAG)
     public static final String KEY_SATELLITE_CONNECTION_HYSTERESIS_SEC_INT =
@@ -10181,8 +10181,8 @@ public class CarrierConfigManager {
      * The default value is 30 seconds.
      */
     @FlaggedApi(Flags.FLAG_CARRIER_ROAMING_NB_IOT_NTN)
-    public static final String KEY_SATELLITE_SCREEN_OFF_INACTIVITY_TIMEOUT_SEC_INT =
-            "satellite_screen_off_inactivity_timeout_sec_int";
+    public static final String KEY_SATELLITE_ROAMING_SCREEN_OFF_INACTIVITY_TIMEOUT_SEC_INT =
+            "satellite_roaming_screen_off_inactivity_timeout_sec_int";
 
     /**
      * An integer key holds the timeout duration in seconds used to determine whether to exit P2P
@@ -10195,8 +10195,8 @@ public class CarrierConfigManager {
      * The default value is 180 seconds.
      */
     @FlaggedApi(Flags.FLAG_CARRIER_ROAMING_NB_IOT_NTN)
-    public static final String KEY_SATELLITE_P2P_SMS_INACTIVITY_TIMEOUT_SEC_INT =
-            "satellite_p2p_sms_inactivity_timeout_sec_int";
+    public static final String KEY_SATELLITE_ROAMING_P2P_SMS_INACTIVITY_TIMEOUT_SEC_INT =
+            "satellite_roaming_p2p_sms_inactivity_timeout_sec_int";
 
     /**
      * An integer key holds the timeout duration in seconds used to determine whether to exit ESOS
@@ -10209,8 +10209,8 @@ public class CarrierConfigManager {
      * The default value is 600 seconds.
      */
     @FlaggedApi(Flags.FLAG_CARRIER_ROAMING_NB_IOT_NTN)
-    public static final String KEY_SATELLITE_ESOS_INACTIVITY_TIMEOUT_SEC_INT =
-            "satellite_esos_inactivity_timeout_sec_int";
+    public static final String KEY_SATELLITE_ROAMING_ESOS_INACTIVITY_TIMEOUT_SEC_INT =
+            "satellite_roaming_esos_inactivity_timeout_sec_int";
 
     /**
      * Indicating whether DUN APN should be disabled when the device is roaming. In that case,
@@ -11464,7 +11464,7 @@ public class CarrierConfigManager {
                 KEY_CARRIER_SUPPORTED_SATELLITE_SERVICES_PER_PROVIDER_BUNDLE,
                 PersistableBundle.EMPTY);
         sDefaults.putBoolean(KEY_SATELLITE_ATTACH_SUPPORTED_BOOL, false);
-        sDefaults.putInt(KEY_SATELLITE_CONNECTION_HYSTERESIS_SEC_INT, 300);
+        sDefaults.putInt(KEY_SATELLITE_CONNECTION_HYSTERESIS_SEC_INT, 180);
         sDefaults.putIntArray(KEY_NTN_LTE_RSRP_THRESHOLDS_INT_ARRAY,
                 // Boundaries: [-140 dBm, -44 dBm]
                 new int[]{
@@ -11516,9 +11516,9 @@ public class CarrierConfigManager {
         sDefaults.putInt(KEY_CARRIER_ROAMING_NTN_EMERGENCY_CALL_TO_SATELLITE_HANDOVER_TYPE_INT,
                 SatelliteManager.EMERGENCY_CALL_TO_SATELLITE_HANDOVER_TYPE_T911);
         sDefaults.putInt(KEY_CARRIER_SUPPORTED_SATELLITE_NOTIFICATION_HYSTERESIS_SEC_INT, 180);
-        sDefaults.putInt(KEY_SATELLITE_SCREEN_OFF_INACTIVITY_TIMEOUT_SEC_INT, 30);
-        sDefaults.putInt(KEY_SATELLITE_P2P_SMS_INACTIVITY_TIMEOUT_SEC_INT, 180);
-        sDefaults.putInt(KEY_SATELLITE_ESOS_INACTIVITY_TIMEOUT_SEC_INT, 600);
+        sDefaults.putInt(KEY_SATELLITE_ROAMING_SCREEN_OFF_INACTIVITY_TIMEOUT_SEC_INT, 30);
+        sDefaults.putInt(KEY_SATELLITE_ROAMING_P2P_SMS_INACTIVITY_TIMEOUT_SEC_INT, 180);
+        sDefaults.putInt(KEY_SATELLITE_ROAMING_ESOS_INACTIVITY_TIMEOUT_SEC_INT, 600);
         sDefaults.putString(KEY_DEFAULT_PREFERRED_APN_NAME_STRING, "");
         sDefaults.putBoolean(KEY_SUPPORTS_CALL_COMPOSER_BOOL, false);
         sDefaults.putBoolean(KEY_SUPPORTS_BUSINESS_CALL_COMPOSER_BOOL, false);

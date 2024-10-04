@@ -19,6 +19,7 @@ package android.telephony.satellite;
 import android.Manifest;
 import android.annotation.CallbackExecutor;
 import android.annotation.FlaggedApi;
+import android.annotation.Hide;
 import android.annotation.IntDef;
 import android.annotation.NonNull;
 import android.annotation.Nullable;
@@ -412,6 +413,22 @@ public final class SatelliteManager {
     @FlaggedApi(Flags.FLAG_OEM_ENABLED_SATELLITE_FLAG)
     public static final int SATELLITE_RESULT_EMERGENCY_CALL_IN_PROGRESS = 27;
 
+    /**
+     * Disabling satellite is in progress.
+     *
+     * @hide
+     */
+    @FlaggedApi(Flags.FLAG_OEM_ENABLED_SATELLITE_FLAG)
+    public static final int SATELLITE_RESULT_DISABLE_IN_PROGRESS = 28;
+
+    /**
+     * Enabling satellite is in progress.
+     *
+     * @hide
+     */
+    @FlaggedApi(Flags.FLAG_OEM_ENABLED_SATELLITE_FLAG)
+    public static final int SATELLITE_RESULT_ENABLE_IN_PROGRESS = 29;
+
     /** @hide */
     @IntDef(prefix = {"SATELLITE_RESULT_"}, value = {
             SATELLITE_RESULT_SUCCESS,
@@ -441,7 +458,9 @@ public final class SatelliteManager {
             SATELLITE_RESULT_MODEM_TIMEOUT,
             SATELLITE_RESULT_LOCATION_DISABLED,
             SATELLITE_RESULT_LOCATION_NOT_AVAILABLE,
-            SATELLITE_RESULT_EMERGENCY_CALL_IN_PROGRESS
+            SATELLITE_RESULT_EMERGENCY_CALL_IN_PROGRESS,
+            SATELLITE_RESULT_DISABLE_IN_PROGRESS,
+            SATELLITE_RESULT_ENABLE_IN_PROGRESS
     })
     @Retention(RetentionPolicy.SOURCE)
     public @interface SatelliteResult {}
@@ -1094,6 +1113,12 @@ public final class SatelliteManager {
      * @hide
      */
     public static final int DATAGRAM_TYPE_SMS = 6;
+    /**
+     * Datagram type indicating that the message to be sent is an SMS checking
+     * for pending incoming SMS.
+     * @hide
+     */
+    public static final int DATAGRAM_TYPE_CHECK_PENDING_INCOMING_SMS = 7;
 
     /** @hide */
     @IntDef(prefix = "DATAGRAM_TYPE_", value = {
@@ -1103,7 +1128,8 @@ public final class SatelliteManager {
             DATAGRAM_TYPE_KEEP_ALIVE,
             DATAGRAM_TYPE_LAST_SOS_MESSAGE_STILL_NEED_HELP,
             DATAGRAM_TYPE_LAST_SOS_MESSAGE_NO_HELP_NEEDED,
-            DATAGRAM_TYPE_SMS
+            DATAGRAM_TYPE_SMS,
+            DATAGRAM_TYPE_CHECK_PENDING_INCOMING_SMS
     })
     @Retention(RetentionPolicy.SOURCE)
     public @interface DatagramType {}
@@ -1201,6 +1227,12 @@ public final class SatelliteManager {
                                 executor.execute(() -> Binder.withCleanCallingIdentity(
                                         () -> callback.onReceiveDatagramStateChanged(
                                                 state, receivePendingCount, errorCode)));
+                            }
+
+                            @Override
+                            public void onSendDatagramRequested(int datagramType) {
+                                executor.execute(() -> Binder.withCleanCallingIdentity(
+                                        () -> callback.onSendDatagramRequested(datagramType)));
                             }
                         };
                 sSatelliteTransmissionUpdateCallbackMap.put(callback, internalCallback);
@@ -1554,6 +1586,13 @@ public final class SatelliteManager {
                     public void onEmergencyModeChanged(boolean isEmergency) {
                         executor.execute(() -> Binder.withCleanCallingIdentity(() ->
                                 callback.onEmergencyModeChanged(isEmergency)));
+                    }
+
+                    @Hide
+                    @Override
+                    public void onRegistrationFailure(int causeCode) {
+                        executor.execute(() -> Binder.withCleanCallingIdentity(() ->
+                                callback.onRegistrationFailure(causeCode)));
                     }
                 };
                 sSatelliteModemStateCallbackMap.put(callback, internalCallback);
