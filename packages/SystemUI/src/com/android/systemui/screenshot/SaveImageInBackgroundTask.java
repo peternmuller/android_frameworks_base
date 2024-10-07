@@ -226,7 +226,7 @@ class SaveImageInBackgroundTask extends AsyncTask<String, Void, Void> {
         // Create a delete action for the notification
         PendingIntent deleteAction = PendingIntent.getBroadcast(context, requestCode,
                 new Intent(context, DeleteScreenshotReceiver.class)
-                        .putExtra(ScreenshotController.SCREENSHOT_URI_ID, uri.toString())
+                        .setData(uri)
                         .putExtra(ScreenshotController.EXTRA_ID, mScreenshotId)
                         .putExtra(ScreenshotController.EXTRA_SMART_ACTIONS_ENABLED,
                                 smartActionsEnabled)
