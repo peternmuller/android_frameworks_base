@@ -71,7 +71,7 @@ public class AconfigFlags {
             try (var inputStream = new FileInputStream(fileName)) {
                 loadAconfigDefaultValues(inputStream.readAllBytes());
             } catch (IOException e) {
-                Slog.e(LOG_TAG, "Failed to read Aconfig values from " + fileName, e);
+                //Slog.e(LOG_TAG, "Failed to read Aconfig values from " + fileName, e);
             }
         }
         if (Process.myUid() == Process.SYSTEM_UID) {
@@ -164,7 +164,7 @@ public class AconfigFlags {
                 }
             }
         } catch (IOException | XmlPullParserException e) {
-            Slog.e(LOG_TAG, "Failed to read Aconfig values from settings_config.xml", e);
+            //Slog.e(LOG_TAG, "Failed to read Aconfig values from settings_config.xml", e);
         }
     }
 
@@ -181,8 +181,8 @@ public class AconfigFlags {
         for (parsed_flag flag : parsedFlags.parsedFlag) {
             String flagPackageAndName = flag.package_ + "." + flag.name;
             boolean flagValue = (flag.state == Aconfig.ENABLED);
-            Slog.v(LOG_TAG, "Read Aconfig default flag value "
-                    + flagPackageAndName + " = " + flagValue);
+            //Slog.v(LOG_TAG, "Read Aconfig default flag value "
+            //        + flagPackageAndName + " = " + flagValue);
             mFlagValues.put(flagPackageAndName, flagValue);
         }
     }
