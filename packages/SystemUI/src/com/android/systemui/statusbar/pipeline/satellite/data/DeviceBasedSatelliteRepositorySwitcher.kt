@@ -118,6 +118,6 @@ constructor(
             .stateIn(
                 scope,
                 SharingStarted.WhileSubscribed(),
-                realImpl.isSatelliteAllowedForCurrentLocation.value
+                realImpl.isSatelliteAllowedForCurrentLocation.value,
             )
 }

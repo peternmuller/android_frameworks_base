@@ -332,11 +332,7 @@ class DeviceBasedSatelliteRepositoryImplTest : SysuiTestCase() {
     fun satelliteProvisioned_notSupported_defaultFalse() =
         testScope.runTest {
             // GIVEN satellite is not supported
-            setUpRepo(
-                uptime = MIN_UPTIME,
-                satMan = satelliteManager,
-                satelliteSupported = false,
-            )
+            setUpRepo(uptime = MIN_UPTIME, satMan = satelliteManager, satelliteSupported = false)
 
             assertThat(underTest.isSatelliteProvisioned.value).isFalse()
         }
@@ -345,11 +341,7 @@ class DeviceBasedSatelliteRepositoryImplTest : SysuiTestCase() {
     fun satelliteProvisioned_supported_defaultFalse() =
         testScope.runTest {
             // GIVEN satellite is supported
-            setUpRepo(
-                uptime = MIN_UPTIME,
-                satMan = satelliteManager,
-                satelliteSupported = true,
-            )
+            setUpRepo(uptime = MIN_UPTIME, satMan = satelliteManager, satelliteSupported = true)
 
             // THEN default provisioned state is false
             assertThat(underTest.isSatelliteProvisioned.value).isFalse()
@@ -513,11 +505,7 @@ class DeviceBasedSatelliteRepositoryImplTest : SysuiTestCase() {
     fun satelliteProvisioned_supported_tracksCallback_reRegistersOnCrash() =
         testScope.runTest {
             // GIVEN satellite is supported
-            setUpRepo(
-                uptime = MIN_UPTIME,
-                satMan = satelliteManager,
-                satelliteSupported = true,
-            )
+            setUpRepo(uptime = MIN_UPTIME, satMan = satelliteManager, satelliteSupported = true)
 
             val provisioned by collectLastValue(underTest.isSatelliteProvisioned)
 
@@ -555,11 +543,7 @@ class DeviceBasedSatelliteRepositoryImplTest : SysuiTestCase() {
     fun satelliteNotSupported_listenersAreNotRegistered() =
         testScope.runTest {
             // GIVEN satellite is not supported
-            setUpRepo(
-                uptime = MIN_UPTIME,
-                satMan = satelliteManager,
-                satelliteSupported = false,
-            )
+            setUpRepo(uptime = MIN_UPTIME, satMan = satelliteManager, satelliteSupported = false)
 
             // WHEN data is requested from the repo
             val connectionState by collectLastValue(underTest.connectionState)
@@ -585,11 +569,7 @@ class DeviceBasedSatelliteRepositoryImplTest : SysuiTestCase() {
     fun satelliteNotSupported_registersCallbackForStateChanges() =
         testScope.runTest {
             // GIVEN satellite is not supported
-            setUpRepo(
-                uptime = MIN_UPTIME,
-                satMan = satelliteManager,
-                satelliteSupported = false,
-            )
+            setUpRepo(uptime = MIN_UPTIME, satMan = satelliteManager, satelliteSupported = false)
 
             runCurrent()
             // THEN the repo registers for state changes of satellite support
@@ -645,11 +625,7 @@ class DeviceBasedSatelliteRepositoryImplTest : SysuiTestCase() {
     fun satelliteNotSupported_supportShowsUp_registersListeners() =
         testScope.runTest {
             // GIVEN satellite is not supported
-            setUpRepo(
-                uptime = MIN_UPTIME,
-                satMan = satelliteManager,
-                satelliteSupported = false,
-            )
+            setUpRepo(uptime = MIN_UPTIME, satMan = satelliteManager, satelliteSupported = false)
             runCurrent()
 
             val callback =
@@ -678,11 +654,7 @@ class DeviceBasedSatelliteRepositoryImplTest : SysuiTestCase() {
     fun repoDoesNotCheckForSupportUntilMinUptime() =
         testScope.runTest {
             // GIVEN we init 100ms after sysui starts up
-            setUpRepo(
-                uptime = 100,
-                satMan = satelliteManager,
-                satelliteSupported = true,
-            )
+            setUpRepo(uptime = 100, satMan = satelliteManager, satelliteSupported = true)
 
             // WHEN data is requested
             val connectionState by collectLastValue(underTest.connectionState)
