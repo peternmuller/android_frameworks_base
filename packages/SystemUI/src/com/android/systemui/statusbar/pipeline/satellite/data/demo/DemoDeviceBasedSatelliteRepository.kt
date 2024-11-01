@@ -17,9 +17,10 @@
 package com.android.systemui.statusbar.pipeline.satellite.data.demo
 
 import android.content.res.Resources
-import com.android.app.tracing.coroutines.launchTraced as launch
 import com.android.systemui.dagger.SysUISingleton
 import com.android.systemui.dagger.qualifiers.Application
+import com.android.systemui.dagger.qualifiers.Main
+import com.android.systemui.res.R
 import com.android.systemui.statusbar.pipeline.satellite.data.DeviceBasedSatelliteRepository
 import com.android.systemui.statusbar.pipeline.satellite.shared.model.SatelliteConnectionState
 import javax.inject.Inject
@@ -34,8 +35,12 @@ class DemoDeviceBasedSatelliteRepository
 constructor(
     private val dataSource: DemoDeviceBasedSatelliteDataSource,
     @Application private val scope: CoroutineScope,
+    @Main resources: Resources,
 ) : DeviceBasedSatelliteRepository {
     private var demoCommandJob: Job? = null
+
+    override val isOpportunisticSatelliteIconEnabled =
+        resources.getBoolean(R.bool.config_showOpportunisticSatelliteIcon)
 
     override val isSatelliteProvisioned = MutableStateFlow(true)
     override val connectionState = MutableStateFlow(SatelliteConnectionState.Unknown)

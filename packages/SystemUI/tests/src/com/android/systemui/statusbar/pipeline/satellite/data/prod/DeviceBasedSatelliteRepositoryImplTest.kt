@@ -101,6 +101,7 @@ class DeviceBasedSatelliteRepositoryImplTest : SysuiTestCase() {
                     logBuffer = FakeLogBuffer.Factory.create(),
                     verboseLogBuffer = FakeLogBuffer.Factory.create(),
                     systemClock,
+                    context.resources,
                 )
 
             val connectionState by collectLastValue(underTest.connectionState)
@@ -383,6 +384,7 @@ class DeviceBasedSatelliteRepositoryImplTest : SysuiTestCase() {
                     logBuffer = FakeLogBuffer.Factory.create(),
                     verboseLogBuffer = FakeLogBuffer.Factory.create(),
                     systemClock,
+                    context.resources,
                 )
 
             // WHEN we try to check for provisioned status
@@ -421,6 +423,7 @@ class DeviceBasedSatelliteRepositoryImplTest : SysuiTestCase() {
                     logBuffer = FakeLogBuffer.Factory.create(),
                     verboseLogBuffer = FakeLogBuffer.Factory.create(),
                     systemClock,
+                    context.resources,
                 )
 
             // WHEN we try to check for provisioned status
@@ -766,6 +769,7 @@ class DeviceBasedSatelliteRepositoryImplTest : SysuiTestCase() {
                 logBuffer = FakeLogBuffer.Factory.create(),
                 verboseLogBuffer = FakeLogBuffer.Factory.create(),
                 systemClock,
+                context.resources,
             )
     }
 

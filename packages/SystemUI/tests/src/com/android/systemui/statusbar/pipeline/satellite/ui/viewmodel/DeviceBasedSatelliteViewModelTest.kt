@@ -124,7 +124,47 @@ class DeviceBasedSatelliteViewModelTest : SysuiTestCase() {
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun icon_nullWhenShouldNotShow_isEmergencyOnly() =
+    fun icon_null_allOosAndNotAllowed() =
+        testScope.runTest {
+            val latest by collectLastValue(underTest.icon)
+
+            // GIVEN satellite is allowed
+            repo.isSatelliteAllowedForCurrentLocation.value = false
+
+            // GIVEN all icons are OOS
+            val i1 = mobileIconsInteractor.getMobileConnectionInteractorForSubId(1)
+            i1.isInService.value = false
+            i1.isEmergencyOnly.value = false
+
+            // GIVEN apm is disabled
+            airplaneModeRepository.setIsAirplaneMode(false)
+
+            // THEN icon is null because it is not allowed
+            assertThat(latest).isNull()
+        }
+
+    @Test
+    fun icon_null_allOosAndConfigIsFalse() =
+        testScope.runTest {
+            val latest by collectLastValue(underTest.icon)
+
+            // GIVEN config for opportunistic icon is false
+            repo.isOpportunisticSatelliteIconEnabled = false
+
+            // GIVEN all icons are OOS
+            val i1 = mobileIconsInteractor.getMobileConnectionInteractorForSubId(1)
+            i1.isInService.value = false
+            i1.isEmergencyOnly.value = false
+
+            // GIVEN apm is disabled
+            airplaneModeRepository.setIsAirplaneMode(false)
+
+            // THEN icon is null because it is not allowed
+            assertThat(latest).isNull()
+        }
+
+    @Test
+    fun icon_null_isEmergencyOnly() =
         testScope.runTest {
             val latest by collectLastValue(underTest.icon)
 
