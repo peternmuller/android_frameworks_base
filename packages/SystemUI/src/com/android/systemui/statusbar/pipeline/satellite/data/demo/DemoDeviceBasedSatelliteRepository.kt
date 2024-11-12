@@ -26,6 +26,7 @@ import com.android.systemui.statusbar.pipeline.satellite.shared.model.SatelliteC
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.MutableStateFlow
 
 /** A satellite repository that represents the latest satellite values sent via demo mode. */
