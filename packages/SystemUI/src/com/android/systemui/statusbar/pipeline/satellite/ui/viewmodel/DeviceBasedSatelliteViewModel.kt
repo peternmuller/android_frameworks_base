@@ -132,7 +132,6 @@ constructor(
                     }
                 }
             }
-        }
 
     // This adds a 10 seconds delay before showing the icon
     private val shouldActuallyShowIcon: StateFlow<Boolean> =
