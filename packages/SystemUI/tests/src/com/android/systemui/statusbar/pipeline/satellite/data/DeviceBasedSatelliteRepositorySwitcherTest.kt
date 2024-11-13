@@ -63,6 +63,7 @@ class DeviceBasedSatelliteRepositorySwitcherTest : SysuiTestCase() {
             logBuffer = FakeLogBuffer.Factory.create(),
             verboseLogBuffer = FakeLogBuffer.Factory.create(),
             systemClock,
+            context.resources,
         )
     private val demoDataSource =
         mock<DemoDeviceBasedSatelliteDataSource>().also {
@@ -77,7 +78,11 @@ class DeviceBasedSatelliteRepositorySwitcherTest : SysuiTestCase() {
                 )
         }
     private val demoImpl =
-        DemoDeviceBasedSatelliteRepository(demoDataSource, testScope.backgroundScope)
+        DemoDeviceBasedSatelliteRepository(
+            demoDataSource,
+            testScope.backgroundScope,
+            context.resources,
+        )
 
     private val underTest =
         DeviceBasedSatelliteRepositorySwitcher(
