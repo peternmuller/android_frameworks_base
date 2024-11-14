@@ -2575,24 +2575,29 @@ public class AudioDeviceInventory {
                     new DeviceInfo(device, name, address,
                             btInfo.mDevice.getIdentityAddress(), codec,
                             groupId, peerAddress, peerIdentityAddress));
-            mDeviceBroker.postAccessoryPlugMediaUnmute(device);
-            setCurrentAudioRouteNameIfPossible(name, /*fromA2dp=*/false);
+            if (btInfo.mIsLeOutput) {
+                mDeviceBroker.postAccessoryPlugMediaUnmute(device);
+                setCurrentAudioRouteNameIfPossible(name, /*fromA2dp=*/false);
+            }
+
             addAudioDeviceInInventoryIfNeeded(device, address, peerAddress,
                     BtHelper.getBtDeviceCategory(address), /*userDefined=*/false);
         }
 
-        if (streamType == AudioSystem.STREAM_DEFAULT) {
-            // No need to update volume for input devices
-            return;
-        }
+        if (btInfo.mIsLeOutput) {
+            if (streamType == AudioSystem.STREAM_DEFAULT) {
+                // No need to update volume for input devices
+                return;
+            }
 
-        final int leAudioVolIndex = (volumeIndex == -1)
+            final int leAudioVolIndex = (volumeIndex == -1)
                 ? mDeviceBroker.getVssVolumeForDevice(streamType, device)
                 : volumeIndex;
-        final int maxIndex = mDeviceBroker.getMaxVssVolumeForStream(streamType);
-        mDeviceBroker.postSetLeAudioVolumeIndex(leAudioVolIndex, maxIndex, streamType);
-        mDeviceBroker.postSetVolumeIndexOnDevice(streamType, leAudioVolIndex, device, "makeLeAudioDeviceAvailable");
-
+            final int maxIndex = mDeviceBroker.getMaxVssVolumeForStream(streamType);
+            mDeviceBroker.postSetLeAudioVolumeIndex(leAudioVolIndex, maxIndex, streamType);
+            mDeviceBroker.postSetVolumeIndexOnDevice(streamType, leAudioVolIndex,
+                                                     device, "makeLeAudioDeviceAvailable");
+        }
         updateBluetoothPreferredModes_l(btInfo.mDevice /*connectedDevice*/);
     }
 
