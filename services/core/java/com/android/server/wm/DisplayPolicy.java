@@ -680,6 +680,8 @@ public class DisplayPolicy {
                         } else {
                             if (SILKY_SCROLLS_ENABLE || SILKY_SCROLLS_LITE_ENABLE){
                                 mPerfBoostDrag.perfEvent(BoostFramework.VENDOR_HINT_DRAG_END, currentPackage);
+                            } else if (mPerfBoostDrag.board_first_api_lvl >= BoostFramework.VENDOR_V_API_LEVEL) {
+                               mPerfBoostDrag.perfHintRelease();
                             }
                             mPerfBoostDrag.perfLockRelease();
                         }
