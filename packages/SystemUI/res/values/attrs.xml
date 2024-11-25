@@ -130,6 +130,7 @@
     <attr name="onShadeInactive" format="reference|color" />
     <attr name="onShadeInactiveVariant" format="reference|color" />
     <attr name="shadeDisabled" format="reference|color" />
+    <attr name="shadeStroke" format="reference|color" />
     <attr name="surfaceBright" format="reference|color" />
     <attr name="scHigh" format="reference|color" />
     <attr name="tertiary" format="reference|color" />
