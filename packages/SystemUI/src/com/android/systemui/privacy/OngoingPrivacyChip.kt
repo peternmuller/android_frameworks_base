@@ -124,8 +124,7 @@ class OngoingPrivacyChip @JvmOverloads constructor(
                 .getDimensionPixelSize(R.dimen.ongoing_appops_chip_icon_margin)
         iconSize = context.resources
                 .getDimensionPixelSize(R.dimen.ongoing_appops_chip_icon_size)
-        iconColor =
-                Utils.getColorAttrDefaultColor(context, com.android.internal.R.attr.colorPrimary)
+        iconColor = context.resources.getColor(android.R.color.black, context.theme)
 
         val height = context.resources
                 .getDimensionPixelSize(R.dimen.ongoing_appops_chip_height)
