@@ -22,9 +22,12 @@ import com.android.systemui.dagger.SysUISingleton
 import com.android.systemui.dagger.qualifiers.Application
 import com.android.systemui.log.LogBuffer
 import com.android.systemui.log.core.LogLevel
+import com.android.systemui.log.table.TableLogBuffer
+import com.android.systemui.log.table.logDiffsForTable
 import com.android.systemui.res.R
 import com.android.systemui.statusbar.pipeline.airplane.data.repository.AirplaneModeRepository
 import com.android.systemui.statusbar.pipeline.dagger.DeviceBasedSatelliteInputLog
+import com.android.systemui.statusbar.pipeline.dagger.DeviceBasedSatelliteTableLog
 import com.android.systemui.statusbar.pipeline.satellite.domain.interactor.DeviceBasedSatelliteInteractor
 import com.android.systemui.statusbar.pipeline.satellite.shared.model.SatelliteConnectionState
 import com.android.systemui.statusbar.pipeline.satellite.ui.model.SatelliteIconModel
@@ -33,14 +36,12 @@ import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 
 /**
@@ -71,49 +72,82 @@ constructor(
     @Application scope: CoroutineScope,
     airplaneModeRepository: AirplaneModeRepository,
     @DeviceBasedSatelliteInputLog logBuffer: LogBuffer,
+    @DeviceBasedSatelliteTableLog tableLog: TableLogBuffer,
 ) : DeviceBasedSatelliteViewModel {
-    private val shouldShowIcon: Flow<Boolean> =
-        interactor.areAllConnectionsOutOfService.flatMapLatest { allOos ->
-            if (!allOos) {
-                flowOf(false)
-            } else {
-                combine(
-                    interactor.isSatelliteAllowed,
-                    interactor.isSatelliteProvisioned,
-                    interactor.isWifiActive,
-                    airplaneModeRepository.isAirplaneMode
-                ) { isSatelliteAllowed, isSatelliteProvisioned, isWifiActive, isAirplaneMode ->
-                    isSatelliteAllowed && isSatelliteProvisioned && !isWifiActive && !isAirplaneMode
-                }
-            }
-        }
 
     // This adds a 10 seconds delay before showing the icon
-    private val shouldActuallyShowIcon: StateFlow<Boolean> =
-        shouldShowIcon
-            .distinctUntilChanged()
-            .flatMapLatest { shouldShow ->
-                if (shouldShow) {
-                    logBuffer.log(
-                        TAG,
-                        LogLevel.INFO,
-                        { long1 = DELAY_DURATION.inWholeSeconds },
-                        { "Waiting $long1 seconds before showing the satellite icon" }
+    private val shouldShowIconForOosAfterHysteresis: StateFlow<Boolean> =
+        if (interactor.isOpportunisticSatelliteIconEnabled) {
+                interactor.areAllConnectionsOutOfService
+                    .flatMapLatest { shouldShow ->
+                        if (shouldShow) {
+                            logBuffer.log(
+                                TAG,
+                                LogLevel.INFO,
+                                { long1 = DELAY_DURATION.inWholeSeconds },
+                                { "Waiting $long1 seconds before showing the satellite icon" },
+                            )
+                            delay(DELAY_DURATION)
+                            flowOf(true)
+                        } else {
+                            flowOf(false)
+                        }
+                    }
+                    .distinctUntilChanged()
+                    .logDiffsForTable(
+                        tableLog,
+                        columnPrefix = "vm",
+                        columnName = COL_VISIBLE_FOR_OOS,
+                        initialValue = false,
                     )
-                    delay(DELAY_DURATION)
-                    flowOf(true)
-                } else {
-                    flowOf(false)
-                }
+            } else {
+                flowOf(false)
             }
             .stateIn(scope, SharingStarted.WhileSubscribed(), false)
 
+   private val canShowIcon =
+        combine(interactor.isSatelliteAllowed, interactor.isSatelliteProvisioned) {
+            allowed,
+            provisioned ->
+            allowed && provisioned
+        }
+
+   private val showIcon =
+        canShowIcon
+            .flatMapLatest { canShow ->
+                if (!canShow) {
+                    flowOf(false)
+                } else {
+                    combine(
+                        shouldShowIconForOosAfterHysteresis,
+                        interactor.connectionState,
+                        interactor.isWifiActive,
+                        airplaneModeRepository.isAirplaneMode,
+                    ) { showForOos, connectionState, isWifiActive, isAirplaneMode ->
+                        if (isWifiActive || isAirplaneMode) {
+                            false
+                        } else {
+                            showForOos ||
+                                connectionState == SatelliteConnectionState.On ||
+                                connectionState == SatelliteConnectionState.Connected
+                        }
+                    }
+                }
+            }
+            .distinctUntilChanged()
+            .logDiffsForTable(
+                tableLog,
+                columnPrefix = "vm",
+                columnName = COL_VISIBLE,
+                initialValue = false,
+            )
+            .stateIn(scope, SharingStarted.WhileSubscribed(), false)
+
     override val icon: StateFlow<Icon?> =
-        combine(
-                shouldActuallyShowIcon,
-                interactor.connectionState,
-                interactor.signalStrength,
-            ) { shouldShow, state, signalStrength ->
+        combine(showIcon, interactor.connectionState, interactor.signalStrength) {
+                shouldShow,
+                state,
+                signalStrength ->
                 if (shouldShow) {
                     SatelliteIconModel.fromConnectionState(state, signalStrength)
                 } else {
@@ -123,10 +157,7 @@ constructor(
             .stateIn(scope, SharingStarted.WhileSubscribed(), null)
 
     override val carrierText: StateFlow<String?> =
-        combine(
-                shouldActuallyShowIcon,
-                interactor.connectionState,
-            ) { shouldShow, connectionState ->
+        combine(showIcon, interactor.connectionState) { shouldShow, connectionState ->
                 logBuffer.log(
                     TAG,
                     LogLevel.INFO,
@@ -134,7 +165,7 @@ constructor(
                         bool1 = shouldShow
                         str1 = connectionState.name
                     },
-                    { "Updating carrier text. shouldShow=$bool1 connectionState=$str1" }
+                    { "Updating carrier text. shouldShow=$bool1 connectionState=$str1" },
                 )
                 if (shouldShow) {
                     when (connectionState) {
@@ -152,18 +183,21 @@ constructor(
                     null
                 }
             }
-            .onEach {
-                logBuffer.log(
-                    TAG,
-                    LogLevel.INFO,
-                    { str1 = it },
-                    { "Resulting carrier text = $str1" }
-                )
-            }
+            .distinctUntilChanged()
+            .logDiffsForTable(
+                tableLog,
+                columnPrefix = "vm",
+                columnName = COL_CARRIER_TEXT,
+                initialValue = null,
+            )
             .stateIn(scope, SharingStarted.WhileSubscribed(), null)
 
     companion object {
         private const val TAG = "DeviceBasedSatelliteViewModel"
         private val DELAY_DURATION = 10.seconds
+
+        const val COL_VISIBLE_FOR_OOS = "visibleForOos"
+        const val COL_VISIBLE = "visible"
+        const val COL_CARRIER_TEXT = "carrierText"
     }
 }

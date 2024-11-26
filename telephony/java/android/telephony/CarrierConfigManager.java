@@ -9926,6 +9926,16 @@ public class CarrierConfigManager {
     public static final String KEY_REMOVE_SATELLITE_PLMN_IN_MANUAL_NETWORK_SCAN_BOOL =
             "remove_satellite_plmn_in_manual_network_scan_bool";
 
+    /**
+     * This value is used to set the max datagram size, if the value is not available then the
+     * default one will be used.
+     * If key is {@code true}, retrieve the max datagram value and use this value always,
+     * {@code false} the default value from the modem will be used.
+     *
+     * @hide
+     */
+    public static final String KEY_SATELLITE_SOS_MAX_DATAGRAM_SIZE =
+            "satellite_sos_max_datagram_size";
 
     /** @hide */
     @IntDef({
@@ -10211,6 +10221,15 @@ public class CarrierConfigManager {
     @FlaggedApi(Flags.FLAG_CARRIER_ROAMING_NB_IOT_NTN)
     public static final String KEY_SATELLITE_ROAMING_ESOS_INACTIVITY_TIMEOUT_SEC_INT =
             "satellite_roaming_esos_inactivity_timeout_sec_int";
+
+    /**
+     * A string array containing the list of messaging package names that support satellite.
+     *
+     * @hide
+     */
+    @FlaggedApi(Flags.FLAG_OEM_ENABLED_SATELLITE_FLAG)
+    public static final String KEY_SATELLITE_SUPPORTED_MSG_APPS_STRING_ARRAY =
+            "satellite_supported_msg_apps_string_array";
 
     /**
      * Indicating whether DUN APN should be disabled when the device is roaming. In that case,
@@ -11636,6 +11655,7 @@ public class CarrierConfigManager {
         sDefaults.putIntArray(KEY_CELLULAR_SERVICE_CAPABILITIES_INT_ARRAY, new int[]{1, 2, 3});
         sDefaults.putInt(KEY_WEAR_CONNECTIVITY_BT_TO_CELL_DELAY_MS_INT, -1);
         sDefaults.putInt(KEY_WEAR_CONNECTIVITY_EXTEND_BT_TO_CELL_DELAY_ON_WIFI_MS_INT, -1);
+        sDefaults.putInt(KEY_SATELLITE_SOS_MAX_DATAGRAM_SIZE, 255);
     }
 
     /**
