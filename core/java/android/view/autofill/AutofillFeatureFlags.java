@@ -421,18 +421,6 @@ public class AutofillFeatureFlags {
                 DEFAULT_CREDENTIAL_MANAGER_ENABLED);
     }
 
-    /**
-     * Whether credential manager tagged views should be ignored for autofill structure.
-     *
-     * @hide
-     */
-    public static boolean shouldIgnoreCredentialViews() {
-        return isCredentialManagerEnabled()
-                && DeviceConfig.getBoolean(
-                DeviceConfig.NAMESPACE_AUTOFILL,
-                DEVICE_CONFIG_AUTOFILL_CREDENTIAL_MANAGER_IGNORE_VIEWS,
-                DEFAULT_CREDENTIAL_MANAGER_IGNORE_VIEWS);
-    }
 
     /**
      * Whether credential manager tagged views should not trigger fill dialog requests.
