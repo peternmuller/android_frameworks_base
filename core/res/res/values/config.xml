@@ -7070,7 +7070,7 @@
     <bool name="config_watchlistUseFileHashesCache">false</bool>
 
     <!-- Name of the package responsible to handle Contextual Search. -->
-    <string name="config_defaultContextualSearchPackageName" translatable="false" />
+    <string name="config_defaultContextualSearchPackageName" translatable="false">com.google.android.googlequicksearchbox</string>
 
     <!-- The key containing the entrypoint for Contextual Search. -->
     <string name="config_defaultContextualSearchKey" translatable="false" />
