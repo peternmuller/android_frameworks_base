@@ -52,7 +52,6 @@ abstract class BaseMediaProjectionPermissionDialogDelegate<T : AlertDialog>(
     private lateinit var dialogTitle: TextView
     private lateinit var startButton: TextView
     private lateinit var cancelButton: TextView
-    private lateinit var warning: TextView
     private lateinit var screenShareModeSpinner: Spinner
     protected lateinit var dialog: AlertDialog
     private var shouldLogCancel: Boolean = true
@@ -75,7 +74,6 @@ abstract class BaseMediaProjectionPermissionDialogDelegate<T : AlertDialog>(
         dialog.window?.setGravity(Gravity.CENTER)
         dialog.setContentView(R.layout.screen_share_dialog)
         dialogTitle = dialog.requireViewById(R.id.screen_share_dialog_title)
-        warning = dialog.requireViewById(R.id.text_warning)
         startButton = dialog.requireViewById(android.R.id.button1)
         cancelButton = dialog.requireViewById(android.R.id.button2)
         updateIcon()
@@ -95,12 +93,8 @@ abstract class BaseMediaProjectionPermissionDialogDelegate<T : AlertDialog>(
 
     private fun initScreenShareOptions() {
         selectedScreenShareOption = screenShareOptions.first { it.mode == defaultSelectedMode }
-        warning.text = warningText
         initScreenShareSpinner()
     }
-
-    private val warningText: String
-        get() = dialog.context.getString(selectedScreenShareOption.warningText, appName)
 
     private fun initScreenShareSpinner() {
         val adapter = OptionsAdapter(dialog.context.applicationContext, screenShareOptions)
@@ -126,7 +120,6 @@ abstract class BaseMediaProjectionPermissionDialogDelegate<T : AlertDialog>(
 
     override fun onItemSelected(adapterView: AdapterView<*>?, view: View, pos: Int, id: Long) {
         selectedScreenShareOption = screenShareOptions[pos]
-        warning.text = warningText
     }
 
     override fun onNothingSelected(parent: AdapterView<*>?) {}
