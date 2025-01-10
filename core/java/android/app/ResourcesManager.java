@@ -423,16 +423,19 @@ public class ResourcesManager {
     }
 
     /**
-     * Protected so that tests can override and returns something a fixed value.
+     * public so that tests can access and override
      */
     @VisibleForTesting
-    protected @NonNull DisplayMetrics getDisplayMetrics(int displayId, DisplayAdjustments da) {
+    public @NonNull DisplayMetrics getDisplayMetrics(int displayId, DisplayAdjustments da) {
         final DisplayManagerGlobal displayManagerGlobal = DisplayManagerGlobal.getInstance();
         final DisplayMetrics dm = new DisplayMetrics();
         final DisplayInfo displayInfo = displayManagerGlobal != null
                 ? displayManagerGlobal.getDisplayInfo(displayId) : null;
         if (displayInfo != null) {
-            displayInfo.getAppMetrics(dm, da);
+            final Configuration dajConfig = da.getConfiguration();
+            displayInfo.getAppMetrics(dm, da.getCompatibilityInfo(),
+                    (mResDisplayId == displayId && Configuration.EMPTY.equals(dajConfig))
+                            ? mResConfiguration : dajConfig);
         } else {
             dm.setToDefaults();
         }
@@ -1833,9 +1836,10 @@ public class ResourcesManager {
                     // have shared library asset paths appended if there are any.
                     if (r.getImpl() != null) {
                         final ResourcesImpl oldImpl = r.getImpl();
+                        final AssetManager oldAssets = oldImpl.getAssets();
                         // ResourcesImpl constructor will help to append shared library asset paths.
-                        if (oldImpl.getAssets().isUpToDate()) {
-                            final ResourcesImpl newImpl = new ResourcesImpl(oldImpl.getAssets(),
+                        if (oldAssets != AssetManager.getSystem() && oldAssets.isUpToDate()) {
+                            final ResourcesImpl newImpl = new ResourcesImpl(oldAssets,
                                     oldImpl.getMetrics(), oldImpl.getConfiguration(),
                                     oldImpl.getDisplayAdjustments());
                             r.setImpl(newImpl);
