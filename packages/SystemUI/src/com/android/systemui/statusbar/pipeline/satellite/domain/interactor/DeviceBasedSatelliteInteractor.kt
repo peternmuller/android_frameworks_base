@@ -21,7 +21,10 @@ import com.android.systemui.dagger.SysUISingleton
 import com.android.systemui.dagger.qualifiers.Application
 import com.android.systemui.log.LogBuffer
 import com.android.systemui.log.core.LogLevel
+import com.android.systemui.log.table.TableLogBuffer
+import com.android.systemui.log.table.logDiffsForTable
 import com.android.systemui.statusbar.pipeline.dagger.DeviceBasedSatelliteInputLog
+import com.android.systemui.statusbar.pipeline.dagger.DeviceBasedSatelliteTableLog
 import com.android.systemui.statusbar.pipeline.mobile.domain.interactor.MobileIconsInteractor
 import com.android.systemui.statusbar.pipeline.satellite.data.DeviceBasedSatelliteRepository
 import com.android.systemui.statusbar.pipeline.satellite.shared.model.SatelliteConnectionState
@@ -33,6 +36,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
@@ -47,7 +51,11 @@ constructor(
     wifiInteractor: WifiInteractor,
     @Application scope: CoroutineScope,
     @DeviceBasedSatelliteInputLog private val logBuffer: LogBuffer,
+    @DeviceBasedSatelliteTableLog private val tableLog: TableLogBuffer,
 ) {
+    /** Whether or not we should show the satellite icon when all connections are OOS */
+    val isOpportunisticSatelliteIconEnabled = repo.isOpportunisticSatelliteIconEnabled
+
     /** Must be observed by any UI showing Satellite iconography */
     val isSatelliteAllowed =
         if (Flags.oemEnabledSatelliteFlag()) {
@@ -55,6 +63,13 @@ constructor(
             } else {
                 flowOf(false)
             }
+            .distinctUntilChanged()
+            .logDiffsForTable(
+                tableLog,
+                columnPrefix = "",
+                columnName = COL_ALLOWED,
+                initialValue = false,
+            )
             .stateIn(scope, SharingStarted.WhileSubscribed(), false)
 
     /** See [SatelliteConnectionState] for relevant states */
@@ -65,6 +80,12 @@ constructor(
 
                 flowOf(SatelliteConnectionState.Off)
             }
+            .distinctUntilChanged()
+            .logDiffsForTable(
+                tableLog,
+                columnPrefix = "",
+                initialValue = SatelliteConnectionState.Off,
+            )
             .stateIn(scope, SharingStarted.WhileSubscribed(), SatelliteConnectionState.Off)
 
     /** 0-4 description of the connection strength */
@@ -74,6 +95,8 @@ constructor(
             } else {
                 flowOf(0)
             }
+            .distinctUntilChanged()
+            .logDiffsForTable(tableLog, columnPrefix = "", columnName = COL_LEVEL, initialValue = 0)
             .stateIn(scope, SharingStarted.WhileSubscribed(), 0)
 
     val isSatelliteProvisioned = repo.isSatelliteProvisioned
@@ -82,27 +105,34 @@ constructor(
         wifiInteractor.wifiNetwork.map { it is WifiNetworkModel.Active }
 
     private val allConnectionsOos =
-        iconsInteractor.icons.aggregateOver(
-            selector = { intr ->
-                combine(intr.isInService, intr.isEmergencyOnly, intr.isNonTerrestrial) {
-                    isInService,
-                    isEmergencyOnly,
-                    isNtn ->
-                    !isInService && !isEmergencyOnly && !isNtn
-                }
-            },
-            defaultValue = true, // no connections == everything is OOS
-        ) { isOosAndNotEmergencyAndNotSatellite ->
-            isOosAndNotEmergencyAndNotSatellite.all { it }
-        }
+        iconsInteractor.icons
+            .aggregateOver(
+                selector = { intr ->
+                    combine(intr.isInService, intr.isEmergencyOnly, intr.isNonTerrestrial) {
+                        isInService,
+                        isEmergencyOnly,
+                        isNtn ->
+                        !isInService && !isEmergencyOnly && !isNtn
+                    }
+                },
+                defaultValue = true, // no connections == everything is OOS
+            ) { isOosAndNotEmergencyAndNotSatellite ->
+                isOosAndNotEmergencyAndNotSatellite.all { it }
+            }
+            .distinctUntilChanged()
+            .logDiffsForTable(
+                tableLog,
+                columnPrefix = "",
+                columnName = COL_ALL_OOS,
+                initialValue = true,
+            )
 
     /** When all connections are considered OOS, satellite connectivity is potentially valid */
     val areAllConnectionsOutOfService =
         if (Flags.oemEnabledSatelliteFlag()) {
-                combine(
-                    allConnectionsOos,
-                    iconsInteractor.isDeviceInEmergencyCallsOnlyMode,
-                ) { connectionsOos, deviceEmergencyOnly ->
+                combine(allConnectionsOos, iconsInteractor.isDeviceInEmergencyCallsOnlyMode) {
+                    connectionsOos,
+                    deviceEmergencyOnly ->
                     logBuffer.log(
                         TAG,
                         LogLevel.INFO,
@@ -122,10 +152,24 @@ constructor(
             } else {
                 flowOf(false)
             }
+            .distinctUntilChanged()
+            .logDiffsForTable(
+                tableLog,
+                columnPrefix = "",
+                columnName = COL_FULL_OOS,
+                initialValue = true,
+            )
             .stateIn(scope, SharingStarted.WhileSubscribed(), true)
 
     companion object {
         const val TAG = "DeviceBasedSatelliteInteractor"
+
+        const val COL_LEVEL = "level"
+        const val COL_ALL_OOS = "allConnsOOS"
+        const val COL_ALLOWED = "allowed"
+        // Going to try to optimize for not using too much width on the table here. This information
+        // can be ascertained by checking for the device emergency only in the mobile logs as well
+        const val COL_FULL_OOS = "allOosAndNoEmer"
     }
 }
 

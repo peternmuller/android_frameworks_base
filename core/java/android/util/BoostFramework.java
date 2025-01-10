@@ -51,6 +51,7 @@ public class BoostFramework {
     public  static final float PERF_HAL_V22 = 2.2f;
     public  static final float PERF_HAL_V23 = 2.3f;
     public static final int VENDOR_T_API_LEVEL = 33;
+    public static final int VENDOR_V_API_LEVEL = 202404;
     public final int board_first_api_lvl = SystemProperties.getInt("ro.board.first_api_level", 0);
     public final int board_api_lvl = SystemProperties.getInt("ro.board.api_level", 0);
 
@@ -60,6 +61,7 @@ public class BoostFramework {
     private static Method sAcquireFunc = null;
     private static Method sPerfHintFunc = null;
     private static Method sReleaseFunc = null;
+    private static Method sPerfHintRelFunc = null;
     private static Method sReleaseHandlerFunc = null;
     private static Method sFeedbackFunc = null;
     private static Method sFeedbackFuncExtn = null;
@@ -259,6 +261,9 @@ public class BoostFramework {
                     argClasses = new Class[] {};
                     sReleaseFunc = sPerfClass.getMethod("perfLockRelease", argClasses);
 
+                    argClasses = new Class[] {};
+                    sPerfHintRelFunc = sPerfClass.getMethod("perfHintRelease", argClasses);
+
                     argClasses = new Class[] {int.class};
                     sReleaseHandlerFunc = sPerfClass.getDeclaredMethod("perfLockReleaseHandler", argClasses);
 
@@ -357,6 +362,20 @@ public class BoostFramework {
         try {
             if (sReleaseFunc != null) {
                 Object retVal = sReleaseFunc.invoke(mPerf);
+                ret = (int)retVal;
+            }
+        } catch(Exception e) {
+            Log.e(TAG,"Exception " + e);
+        }
+        return ret;
+    }
+
+/** @hide */
+    public int perfHintRelease() {
+        int ret = -1;
+        try {
+            if (sPerfHintRelFunc != null) {
+                Object retVal = sPerfHintRelFunc.invoke(mPerf);
                 ret = (int)retVal;
             }
         } catch(Exception e) {

@@ -209,6 +209,7 @@ public class DisplayPolicy {
 
     private static boolean SCROLL_BOOST_SS_ENABLE = false;
     private static boolean SILKY_SCROLLS_ENABLE = false;
+    private static boolean SILKY_SCROLLS_LITE_ENABLE = false;
     private static boolean isLowRAM = false;
 
     /*
@@ -483,6 +484,7 @@ public class DisplayPolicy {
         if (mPerf != null) {
             SCROLL_BOOST_SS_ENABLE = Boolean.parseBoolean(mPerf.perfGetProp("vendor.perf.gestureflingboost.enable", "false"));
             SILKY_SCROLLS_ENABLE = Boolean.parseBoolean(mPerf.perfGetProp("ro.vendor.perf.ss", "false"));
+            SILKY_SCROLLS_LITE_ENABLE = Boolean.parseBoolean(mPerf.perfGetProp("ro.vendor.perf.silkyscrolls_lite", "false"));
         }
         isLowRAM = SystemProperties.getBoolean("ro.config.low_ram", false);
 
@@ -676,8 +678,10 @@ public class DisplayPolicy {
                             mPerfBoostDrag.perfHint(BoostFramework.VENDOR_HINT_DRAG_BOOST,
                                             currentPackage, -1, 1);
                         } else {
-                            if (SILKY_SCROLLS_ENABLE){
+                            if (SILKY_SCROLLS_ENABLE || SILKY_SCROLLS_LITE_ENABLE){
                                 mPerfBoostDrag.perfEvent(BoostFramework.VENDOR_HINT_DRAG_END, currentPackage);
+                            } else if (mPerfBoostDrag.board_first_api_lvl >= BoostFramework.VENDOR_V_API_LEVEL) {
+                               mPerfBoostDrag.perfHintRelease();
                             }
                             mPerfBoostDrag.perfLockRelease();
                         }

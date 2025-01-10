@@ -67,6 +67,7 @@ class DeviceBasedSatelliteInteractorTest : SysuiTestCase() {
                 wifiInteractor,
                 testScope.backgroundScope,
                 FakeLogBuffer.Factory.create(),
+                mock(),
             )
     }
 
@@ -110,6 +111,7 @@ class DeviceBasedSatelliteInteractorTest : SysuiTestCase() {
                     wifiInteractor,
                     testScope.backgroundScope,
                     FakeLogBuffer.Factory.create(),
+                    mock(),
                 )
 
             val latest by collectLastValue(underTest.isSatelliteAllowed)
@@ -158,6 +160,7 @@ class DeviceBasedSatelliteInteractorTest : SysuiTestCase() {
                     wifiInteractor,
                     testScope.backgroundScope,
                     FakeLogBuffer.Factory.create(),
+                    mock(),
                 )
 
             val latest by collectLastValue(underTest.connectionState)
@@ -214,6 +217,7 @@ class DeviceBasedSatelliteInteractorTest : SysuiTestCase() {
                     wifiInteractor,
                     testScope.backgroundScope,
                     FakeLogBuffer.Factory.create(),
+                    mock(),
                 )
 
             val latest by collectLastValue(underTest.signalStrength)
@@ -532,6 +536,7 @@ class DeviceBasedSatelliteInteractorTest : SysuiTestCase() {
                     wifiInteractor,
                     testScope.backgroundScope,
                     FakeLogBuffer.Factory.create(),
+                    mock(),
                 )
 
             val latest by collectLastValue(underTest.areAllConnectionsOutOfService)
