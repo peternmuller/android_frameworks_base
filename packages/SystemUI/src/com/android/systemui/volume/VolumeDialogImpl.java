@@ -60,6 +60,7 @@ import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
+import android.database.ContentObserver;
 import android.graphics.Color;
 import android.graphics.Outline;
 import android.graphics.PixelFormat;
@@ -219,6 +220,7 @@ public class VolumeDialogImpl implements VolumeDialog, Dumpable,
 
     private Window mWindow;
     private CustomDialog mDialog;
+    private ContentObserver mContentObserver;
     private ViewGroup mDialogView;
     private ViewGroup mDialogRowsViewContainer;
     private ViewGroup mDialogRowsView;
@@ -326,6 +328,7 @@ public class VolumeDialogImpl implements VolumeDialog, Dumpable,
 
     // Volume panel expand state
     private boolean mExpanded;
+    private boolean mExpandable;
 
     // Number of animating rows
     private int mAnimatingRows = 0;
@@ -421,6 +424,19 @@ public class VolumeDialogImpl implements VolumeDialog, Dumpable,
             };
         }
 
+        ContentObserver volumeExpandObserver = new ContentObserver(null) {
+            @Override
+            public void onChange(boolean selfChange) {
+                    mExpandable = Settings.System.getInt(
+                    mContext.getContentResolver(),
+                    "volume_panel_expandable", 1) != 0;
+            }
+        };
+        mContext.getContentResolver().registerContentObserver(
+                    Settings.System.getUriFor("volume_panel_expandable"),
+                    false, volumeExpandObserver);
+        volumeExpandObserver.onChange(true);
+
         initDimens();
 
         mOrientation = mContext.getResources().getConfiguration().orientation;
@@ -488,6 +504,7 @@ public class VolumeDialogImpl implements VolumeDialog, Dumpable,
             mDevicePostureController.removeCallback(mDevicePostureControllerCallback);
         }
         mVolumeDialogMenuIconBinder.destroy();
+        mContext.getContentResolver().unregisterContentObserver(mContentObserver);
     }
 
     @Override
@@ -1457,9 +1474,15 @@ public class VolumeDialogImpl implements VolumeDialog, Dumpable,
         }
         if (mExpandRows != null) {
             mExpandRows.setOnClickListener(v -> {
-                mExpanded = !mExpanded;
-                updateRowsH(mDefaultRow, true);
-                mExpandRows.setExpanded(mExpanded);
+                if (mExpandable) {
+                    mExpanded = !mExpanded;
+                    updateRowsH(mDefaultRow, true);
+                    mExpandRows.setExpanded(mExpanded);
+                } else {
+                    mMediaOutputDialogManager.dismiss();
+                    mVolumeNavigator.openVolumePanel(
+                            mVolumePanelNavigationInteractor.getVolumePanelRoute());
+                }
             });
         }
     }
