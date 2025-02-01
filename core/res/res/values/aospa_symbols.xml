@@ -117,4 +117,7 @@
          maximum duration in ms the slider vibrations scale to from 0 -->
     <java-symbol type="integer" name="config_sliderVibFallbackDuration" />
 
+    <!-- Slider vibrations fallbacks - set to true to vary amplitude in addition to duration -->
+    <java-symbol type="bool" name="config_sliderVibFallbackWaveform" />
+
 </resources>
