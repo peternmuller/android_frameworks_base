@@ -181,7 +181,7 @@
     <dimen name="status_bar_clock_starting_padding">4dp</dimen>
 
     <!-- The end padding for the clock in the status bar. -->
-    <dimen name="status_bar_clock_end_padding">0dp</dimen>
+    <dimen name="status_bar_clock_end_padding">3dp</dimen>
 
     <!-- Starting padding for a left-aligned status bar clock -->
     <dimen name="status_bar_left_clock_starting_padding">0dp</dimen>
@@ -403,7 +403,7 @@
     <dimen name="status_bar_icons_padding_top">0dp</dimen>
 
     <!-- gap on either side of status bar notification icons -->
-    <dimen name="status_bar_icon_horizontal_margin">0sp</dimen>
+    <dimen name="status_bar_icon_horizontal_margin">-1sp</dimen>
 
     <!-- the padding on the start of the statusbar -->
     <dimen name="status_bar_padding_start">4dp</dimen>
