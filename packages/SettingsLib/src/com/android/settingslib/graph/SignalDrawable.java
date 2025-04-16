@@ -30,6 +30,7 @@ import android.graphics.Path.FillType;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
+import android.graphics.RectF;
 import android.graphics.drawable.DrawableWrapper;
 import android.os.Handler;
 import android.telephony.CellSignalStrength;
@@ -257,6 +258,15 @@ public class SignalDrawable extends DrawableWrapper {
             // Adjust mScaledRoamingPath
             Path adjustedRoamingPath = new Path(mScaledRoamingPath);
             Matrix matrix = new Matrix();
+            // Flip the path horizontally to cancel canvas mirror
+            // as we don't to flip the roaming icon in RTL
+            if (isRtl) {
+                RectF pathBounds = new RectF();
+                mScaledRoamingPath.computeBounds(pathBounds, true);
+                float centerX = pathBounds.centerX();
+                float centerY = pathBounds.centerY();
+                matrix.postScale(-1f, 1f, centerX, centerY);
+            }
             matrix.postTranslate(rIconOffset, 0);
             adjustedRoamingPath.transform(matrix);
             canvas.drawPath(adjustedRoamingPath, mForegroundPaint);
