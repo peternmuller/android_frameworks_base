@@ -1548,6 +1548,16 @@ public final class CachedAppOptimizer {
     @GuardedBy({"mAm", "mProcLock"})
     private void freezeAppAsyncInternalLSP(ProcessRecord app, @UptimeMillisLong long delayMillis,
             boolean force) {
+        final ProcessStateRecord state = app.mState;
+        if (state.hasShownUi()) {
+            if (DEBUG_FREEZER) {
+                Slog.d(TAG_AM,
+                        "Skip freezing because app has show UI pid=" + app.getPid() + " "
+                                + app.processName);
+            }
+            return;
+        }
+
         final ProcessCachedOptimizerRecord opt = app.mOptRecord;
         if (opt.isPendingFreeze()) {
             if (delayMillis == 0) {
