@@ -1713,7 +1713,7 @@
     <string name="kg_failed_attempts_almost_at_login" product="tablet" msgid="7086799295109717623">"የመክፈቻ ስርዓተ ጥለቱን <xliff:g id="NUMBER_0">%1$d</xliff:g> ጊዜ በትክክል አልሳሉትም። ከ<xliff:g id="NUMBER_1">%2$d</xliff:g> ተጨማሪ ያልተሳኩ ሙከራዎች በኋላ የኢሜይል መለያ ተጠቅመው ጡባዊ ቱኮዎን እንዲከፍቱ ይጠየቃሉ።\n\n ከ<xliff:g id="NUMBER_2">%3$d</xliff:g> ከሰከንዶች በኋላ እንደገና ይሞክሩ።"</string>
     <string name="kg_failed_attempts_almost_at_login" product="tv" msgid="4670840383567106114">"የመክፈቻ ሥርዓተ ጥለቱን <xliff:g id="NUMBER_0">%1$d</xliff:g> ጊዜ በትክክል አልሣሉትም። ከ<xliff:g id="NUMBER_1">%2$d</xliff:g> ተጨማሪ ያልተሳኩ ሙከራዎች በኋላ የኢሜይል መለያ ተጠቅመው የእርስዎን Android TV ን እንዲከፍቱ ይጠየቃሉ።\n\nእባክዎ ከ<xliff:g id="NUMBER_2">%3$d</xliff:g> ሰከንዶች በኋላ እንደገና ይሞክሩ።"</string>
     <string name="kg_failed_attempts_almost_at_login" product="default" msgid="5270861875006378092">"የመክፈቻ ስርዓተ ጥለቱን <xliff:g id="NUMBER_0">%1$d</xliff:g> ጊዜ በትክክል አልሳሉትም። ከ<xliff:g id="NUMBER_1">%2$d</xliff:g> ተጨማሪ ያልተሳኩ ሙከራዎች በኋላ የኢሜይል መለያ ተጠቅመው ስልክዎን እንዲከፍቱ ይጠየቃሉ።\n\nእባክዎ ከ<xliff:g id="NUMBER_2">%3$d</xliff:g> ሰከንዶች በኋላ እንደገና ይሞክሩ።"</string>
-    <string name="kg_text_message_separator" product="default" msgid="4503708889934976866">" — "</string>
+    <string name="kg_text_message_separator" product="default" msgid="4503708889934976866">" | "</string>
     <string name="kg_reordering_delete_drop_target_text" msgid="2034358143731750914">"አስወግድ"</string>
     <string name="safe_media_volume_warning" product="default" msgid="3751676824423049994">"ድምጹ ከሚመከረው መጠን በላይ ከፍ ይበል?\n\nበከፍተኛ ድምፅ ለረጅም ጊዜ ማዳመጥ ጆሮዎን ሊጎዳው ይችላል።"</string>
     <string name="csd_dose_reached_warning" product="default" msgid="491875107583931974">"በከፍተኛ የድምፅ መጠን ማዳመጥ ይቀጥሉ?\n\nየራስ ላይ ማዳመጫ የድምፅ መጠን ከሚመከረው ጊዜ በላይ ከፍ ብሎ ቆይቷል፣ ይህም የመስሚያ ችሎታዎን ሊጎዳ ይችላል"</string>

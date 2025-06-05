@@ -1713,7 +1713,7 @@
     <string name="kg_failed_attempts_almost_at_login" product="tablet" msgid="7086799295109717623">"你的解鎖圖案已畫錯 <xliff:g id="NUMBER_0">%1$d</xliff:g> 次，如果再嘗試 <xliff:g id="NUMBER_1">%2$d</xliff:g> 次仍未成功，系統就會要求你透過電子郵件帳戶解除平板電腦的鎖定狀態。\n\n請在 <xliff:g id="NUMBER_2">%3$d</xliff:g> 秒後再試一次。"</string>
     <string name="kg_failed_attempts_almost_at_login" product="tv" msgid="4670840383567106114">"你已畫錯解鎖圖案 <xliff:g id="NUMBER_0">%1$d</xliff:g> 次，目前還剩 <xliff:g id="NUMBER_1">%2$d</xliff:g> 次機會。如果失敗次數超過上限，系統就會要求你使用電子郵件帳戶解鎖 Android TV 裝置。\n\n 請於 <xliff:g id="NUMBER_2">%3$d</xliff:g> 秒後再試一次。"</string>
     <string name="kg_failed_attempts_almost_at_login" product="default" msgid="5270861875006378092">"你的解鎖圖案已畫錯 <xliff:g id="NUMBER_0">%1$d</xliff:g> 次，如果再嘗試 <xliff:g id="NUMBER_1">%2$d</xliff:g> 次仍未成功，系統就會要求你透過電子郵件帳戶解除手機的鎖定狀態。\n\n請在 <xliff:g id="NUMBER_2">%3$d</xliff:g> 秒後再試一次。"</string>
-    <string name="kg_text_message_separator" product="default" msgid="4503708889934976866">" — "</string>
+    <string name="kg_text_message_separator" product="default" msgid="4503708889934976866">" | "</string>
     <string name="kg_reordering_delete_drop_target_text" msgid="2034358143731750914">"移除"</string>
     <string name="safe_media_volume_warning" product="default" msgid="3751676824423049994">"要調高音量，比建議的音量更大聲嗎？\n\n長時間聆聽高分貝音量可能會使你的聽力受損。"</string>
     <string name="csd_dose_reached_warning" product="default" msgid="491875107583931974">"要繼續以高音量聆聽嗎？\n\n耳罩式耳機以高音量播放已超過建議時間，可能會傷害聽力"</string>

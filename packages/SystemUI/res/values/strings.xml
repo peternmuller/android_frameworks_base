@@ -93,7 +93,7 @@
     <string name="status_bar_settings_auto_rotation">Auto-rotate screen</string>
 
     <!-- Separator for PLMN and SPN in network name. -->
-    <string name="status_bar_network_name_separator" translatable="false"> - </string>
+    <string name="status_bar_network_name_separator" translatable="false"> | </string>
 
     <!-- Prompt for the USB device permission dialog [CHAR LIMIT=80] -->
     <string name="usb_device_permission_prompt">Allow <xliff:g id="application" example= "Usb Mega Player">%1$s</xliff:g> to access <xliff:g id="usb_device" example="USB Headphones">%2$s</xliff:g>?</string>
