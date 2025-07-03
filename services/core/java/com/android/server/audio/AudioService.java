@@ -1263,7 +1263,10 @@ public class AudioService extends IAudioService.Stub
                     (MAX_STREAM_VOLUME[AudioSystem.STREAM_VOICE_CALL] * 3) / 4;
         }
 
-        MAX_STREAM_VOLUME[AudioSystem.STREAM_MUSIC] = 15;
+        int maxMusicVolume = SystemProperties.getInt("ro.config.media_vol_steps", -1);
+        if (maxMusicVolume != -1) {
+            MAX_STREAM_VOLUME[AudioSystem.STREAM_MUSIC] = maxMusicVolume;
+        }
 
         int defaultMusicVolume = SystemProperties.getInt("ro.config.media_vol_default", -1);
         if (defaultMusicVolume != -1 &&
