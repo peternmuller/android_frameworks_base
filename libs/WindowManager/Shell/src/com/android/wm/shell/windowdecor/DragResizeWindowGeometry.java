@@ -45,7 +45,7 @@ import java.util.Objects;
  */
 final class DragResizeWindowGeometry {
     // TODO(b/337264971) clean up when no longer needed
-    @VisibleForTesting static final boolean DEBUG = true;
+    @VisibleForTesting static final boolean DEBUG = false;
     // The additional width to apply to edge resize bounds just for logging when a touch is
     // close.
     @VisibleForTesting static final int EDGE_DEBUG_BUFFER = 15;
