@@ -53,7 +53,7 @@ import java.util.concurrent.Executor;
 public class Smart5gService extends SystemService {
 
     private static final String TAG = "Smart5gService";
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = false;
 
     // from org.codeaurora.telephony.utils.EnhancedRadioCapabilityResponse
     private static final int NETWORK_TYPE_NR_NSA = 20; // = TelephonyManager.NETWORK_TYPE_NR
