@@ -9167,6 +9167,9 @@ public final class ActivityRecord extends WindowToken implements WindowManagerSe
                 ? getFixedRotationTransformDisplayInfo()
                 : mDisplayContent.getDisplayInfo();
         final Task task = getTask();
+        if (task == null) {
+            return true;
+        }
         task.calculateInsetFrames(outNonDecorBounds /* outNonDecorBounds */,
                 outStableBounds /* outStableBounds */, parentBounds /* bounds */, di,
                 mResolveConfigHint.mUseOverrideInsetsForConfig);
