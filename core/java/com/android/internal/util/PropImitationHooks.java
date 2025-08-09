@@ -49,6 +49,7 @@ public class PropImitationHooks {
 
     private static final String TAG = "PropImitationHooks";
 
+    private static final String PACKAGE_FINSKY = "com.android.vending";
     private static final String PACKAGE_GMS = "com.google.android.gms";
     private static final String PROCESS_GMS_UNSTABLE = PACKAGE_GMS + ".unstable";
 
@@ -76,13 +77,14 @@ public class PropImitationHooks {
         "PIXEL_2020_MIDYEAR_EXPERIENCE"
     );
 
-    private static volatile boolean sIsGms, sIsPhotos;
+    private static volatile boolean sIsGms, sIsPhotos, sIsFinsky;
     private static volatile List<String> sCertifiedProps = new ArrayList<>();
 
     public static void setProps(Context context) {
         final String packageName = context.getPackageName();
         final String processName = Application.getProcessName();
 
+        sIsFinsky = packageName.equals(PACKAGE_FINSKY);
         sIsGms = packageName.equals(PACKAGE_GMS) && processName.equals(PROCESS_GMS_UNSTABLE);
         sIsPhotos = packageName.equals(PACKAGE_GPHOTOS);
 
@@ -91,8 +93,8 @@ public class PropImitationHooks {
             return;
         }
 
-        if (sIsGms) {
-            Log.d(TAG, "Spoofing json.pif for gms");
+        if (sIsGms || sIsFinsky) {
+            Log.d(TAG, "Spoofing PIF JSON for GMS / Finsky");
             if (loadFromJsonSetting(context))
                 setCertifiedPropsForGms();
         } else if (sIsPhotos) {
@@ -157,10 +159,10 @@ public class PropImitationHooks {
             }
         };
         if (!was) {
-            Log.d(TAG, "Spoofing build for GMS");
+            Log.d(TAG, "Spoofing build for GMS / Finsky");
             setCertifiedProps();
         } else {
-            Log.d(TAG, "Skip spoofing build for GMS, because GmsAddAccountActivityOnTop");
+            Log.d(TAG, "Skip spoofing build for GMS / Finsky, because GmsAddAccountActivityOnTop");
         }
         try {
             ActivityTaskManager.getService().registerTaskStackListener(taskStackListener);
