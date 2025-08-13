@@ -12242,7 +12242,7 @@ public class AudioService extends IAudioService.Stub
     /** Wrapper which encapsulates the {@link IVolumeController} functionality. */
     public class VolumeController implements ISafeHearingVolumeController {
         private static final String TAG = "VolumeController";
-        private static final long VOLUME_KEY_PRESS_INTERVAL = 80;
+        private static final long VOLUME_KEY_PRESS_INTERVAL = 20;
 
         private IVolumeController mController;
         private boolean mVisible;
