@@ -688,6 +688,28 @@ public class DexManager {
         return isBtmCritical;
     }
 
+    /**
+     * Returns true if background dexopt should be skipped due to battery/power constraints.
+     * Background dexopt should only run when the device is charging to avoid draining the battery.
+     */
+    public boolean shouldSkipBackgroundDexopt() {
+        BatteryManager batteryManager = getBatteryManager();
+        if (batteryManager == null) {
+            // If we can't determine battery status, skip background dexopt to be safe
+            return true;
+        }
+
+        int batteryStatus = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_STATUS);
+        // Only allow background dexopt when charging
+        boolean isCharging = (batteryStatus == BatteryManager.BATTERY_STATUS_CHARGING);
+        
+        // Also check thermal constraints
+        boolean thermalConstrained = (mPowerManager != null
+                && mPowerManager.getCurrentThermalStatus() >= PowerManager.THERMAL_STATUS_SEVERE);
+
+        return !isCharging || thermalConstrained;
+    }
+
     public static class RegisterDexModuleResult {
         public RegisterDexModuleResult() {
             this(false, null);

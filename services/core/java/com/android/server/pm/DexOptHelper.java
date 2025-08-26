@@ -114,6 +114,60 @@ public final class DexOptHelper {
         mPm = pm;
     }
 
+    /**
+     * Detects if we're currently in a background dexopt context by examining the call stack.
+     * Background dexopt operations typically come from the ART service via shell commands.
+     */
+    private static boolean isBackgroundDexoptContext() {
+        // Look for indicators in the call stack that suggest this is background dexopt
+        StackTraceElement[] stack = Thread.currentThread().getStackTrace();
+        for (StackTraceElement element : stack) {
+            String className = element.getClassName();
+            String methodName = element.getMethodName();
+            
+            // Check for ART service background dexopt patterns
+            if (className.contains("ArtManagerService") || 
+                className.contains("ArtManagerLocal") ||
+                methodName.contains("runArtServiceCommand") ||
+                methodName.contains("bg-dexopt") ||
+                methodName.contains("handleShellCommand")) {
+                return true;
+            }
+            
+            // Check for idle/background dexopt job indicators
+            if (methodName.contains("IdleBackgroundJob") ||
+                methodName.contains("backgroundDexopt") ||
+                className.contains("BackgroundDexOpt")) {
+                return true;
+            }
+
+            // Also check for shell command execution which is how bg-dexopt-job is invoked
+            if (className.contains("PackageManagerShellCommand") &&
+                (methodName.contains("runCommand") || methodName.contains("onCommand"))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Alternative approach: Store context when background dexopt operations start
+     */
+    private static final ThreadLocal<Boolean> sIsBackgroundDexopt = new ThreadLocal<Boolean>() {
+        @Override
+        protected Boolean initialValue() {
+            return false;
+        }
+    };
+
+    public static void setBackgroundDexoptContext(boolean isBackground) {
+        sIsBackgroundDexopt.set(isBackground);
+    }
+
+    public static boolean isInBackgroundDexoptContext() {
+        return sIsBackgroundDexopt.get() || isBackgroundDexoptContext();
+    }
+
     /*
      * Return the prebuilt profile path given a package base code path.
      */
@@ -374,7 +428,28 @@ public final class DexOptHelper {
 
         // Override the "don't compile apps that weren't used in the last 7 days" policy:
         // JIT is disabled, apps that aren't compiled would run via the slow interpreter
-        remainingPredicate = pkgSetting -> true;
+        // However, for background/idle dexopt operations, only do this when charging to avoid battery drain
+        boolean shouldRespectChargingConstraints = isInBackgroundDexoptContext();
+        
+        if (shouldRespectChargingConstraints) {
+            // For background dexopt, check if device is charging before compiling all apps
+            DexManager dexManager = packageManagerService.getDexManager();
+            if (dexManager != null && dexManager.shouldSkipBackgroundDexopt()) {
+                // Device not charging or thermal constrained - stick to usage-based filtering
+                if (debug) {
+                    Log.i(TAG, "Device not charging or thermally constrained - using usage-based filtering for background dexopt");
+                }
+            } else {
+                // Device is charging - safe to compile all apps
+                remainingPredicate = pkgSetting -> true;
+                if (debug) {
+                    Log.i(TAG, "Device charging - compiling all apps for background dexopt");
+                }
+            }
+        } else {
+            // Non-background dexopt (installation, boot, etc.) - use the override
+            remainingPredicate = pkgSetting -> true;
+        }
 
         applyPackageFilter(snapshot, remainingPredicate, result, remainingPkgSettings, sortTemp,
                 packageManagerService);
